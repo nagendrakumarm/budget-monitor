@@ -1,0 +1,47 @@
+<div class="dashboard-grid">
+  <mat-card class="card">
+    <mat-card-title>Monthly Income</mat-card-title>
+    <mat-card-content>
+      <h2>{{ totalIncome | currency }}</h2>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="card" [class.positive-bg]="netCash >= 0" [class.negative-bg]="netCash < 0">
+    <mat-card-title>Net Cashflow</mat-card-title>
+    <mat-card-content>
+      <h2>{{ netCash | currency }}</h2>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="card">
+    <mat-card-title>Monthly Expenses</mat-card-title>
+    <mat-card-content>
+      <h2>{{ totalExpenses | currency }}</h2>
+      <h4>{{ expensePct | percent }}</h4>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="card">
+    <mat-card-title>Needs</mat-card-title>
+    <mat-card-content>
+      <h2>{{ totalNeeds | currency }}</h2>
+      <h4>{{ needsPct | percent }}</h4>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="card">
+    <mat-card-title>Wants</mat-card-title>
+    <mat-card-content>
+      <h2>{{ totalWants | currency }}</h2>
+      <h4>{{ wantsPct | percent }}</h4>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="card">
+    <mat-card-title>Investments</mat-card-title>
+    <mat-card-content>
+      <h2>{{ totalInvestments | currency }}</h2>
+      <h4>{{ investmentsPct | percent }}</h4>
+    </mat-card-content>
+  </mat-card>
+</div>

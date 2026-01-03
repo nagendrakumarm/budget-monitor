@@ -1,0 +1,19 @@
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  text-align: center;
+}
+
+.positive-bg {
+  background-color: #e8f5e9; /* Light green */
+  color: #2e7d32;
+}
+
+.negative-bg {
+  background-color: #ffebee; /* Light red */
+  color: #c62828;
+}
