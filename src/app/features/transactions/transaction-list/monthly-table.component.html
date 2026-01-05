@@ -1,0 +1,46 @@
+<div class="table-container">
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>Income</th>
+        <th>Total</th>
+        <th>Needs</th>
+        <th>Wants</th>
+        <th>Investments</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let row of summaries" [class.positive-bg]="row.income > row.total" [class.negative-bg]="row.income < row.total">
+        <td>{{ row.month }}</td>
+        <td>{{ row.income | currency:'USD':'symbol':'1.2-2' }}</td>
+        <td>{{ row.total | currency:'USD':'symbol':'1.2-2' }}</td>
+        <td>
+          {{ row.needs | currency:'USD':'symbol':'1.2-2' }}
+          @if (row.income > 0) {
+            <span [ngClass]="(row.needs / row.income) * 100 < 40 ? 'pct-high' : 'pct-low' ">
+              - {{ (row.needs / row.income) * 100 | number:'1.0-2' }}%
+            </span>
+          }
+        </td>
+        <td>
+          {{ row.wants | currency:'USD':'symbol':'1.2-2' }}
+          @if (row.income > 0) {
+            <span [ngClass]="(row.wants / row.income) * 100 < 30 ? 'pct-high' : 'pct-low' ">
+              - {{ (row.wants / row.income) * 100 | number:'1.0-2' }}%
+            </span>
+          }
+        </td>
+        <td>
+          {{ row.investments | currency:'USD':'symbol':'1.2-2' }}
+          @if (row.income > 0) {
+            <span [ngClass]="(row.investments / row.investments) * 100 < 20 ? 'pct-high' : 'pct-low' ">
+              - {{ (row.investments / row.income) * 100 | number:'1.0-2' }}%
+            </span>
+          }
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

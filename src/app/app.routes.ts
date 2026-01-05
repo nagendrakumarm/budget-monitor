@@ -3,6 +3,7 @@ import { DashboardComponent } from '../app/features/dashboard/dashboard.componen
 import { TransactionListComponent } from '../app/features/transactions/transaction-list/transaction-list.component';
 import { AddTransactionComponent } from '../app/features/transactions/add-transaction/add-transaction.component';
 import { TransactionUploadComponent } from './features/transactions/upload/upload.component';
+import { MonthlyTableComponent } from './features/transactions/transaction-list/monthly-table.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -10,5 +11,6 @@ export const routes: Routes = [
   { path: 'transactions', component: TransactionListComponent },
   { path: 'transactions/new', component: AddTransactionComponent },
   { path: 'upload', component: TransactionUploadComponent },
+  { path: 'monthly', component: MonthlyTableComponent },
   { path: '**', redirectTo: 'dashboard' }
 ];

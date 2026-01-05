@@ -12,3 +12,13 @@ export interface Transaction {
   };
 
 }
+
+
+export interface MonthlySummary {
+  month: string;   
+  income: number;     
+  total: number;
+  needs: number;
+  wants: number;
+  investments: number;
+}
