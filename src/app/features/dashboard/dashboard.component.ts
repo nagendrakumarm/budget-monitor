@@ -42,7 +42,7 @@ export class DashboardComponent implements OnInit {
     const year = now.getFullYear();
 
     const monthTx = this.transactions.filter(t => {
-      const d = new Date(t.date);
+      const d = new Date(t.date + 'T00:00:00');
       return d.getMonth() === month && d.getFullYear() === year;
     });
 

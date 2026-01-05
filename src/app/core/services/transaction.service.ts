@@ -63,4 +63,15 @@ export class TransactionService {
 
     if (error) throw error;
   }
+
+  async uploadTransactions(transactions: Transaction[]) {
+    const { data, error } = await supabase
+      .from('Transactions')
+      .insert(transactions);
+
+    console.log('Insert response: ' , {data, error});
+    if (error) throw error;
+    return data;
+  }
+
 }

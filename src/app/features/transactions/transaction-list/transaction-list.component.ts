@@ -1,13 +1,18 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
 import { Transaction } from '../../../core/models/transaction.model';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { DatePipe, CurrencyPipe } from '@angular/common';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { FormsModule } from '@angular/forms';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-transaction-list',
@@ -18,19 +23,27 @@ import { DatePipe, CurrencyPipe } from '@angular/common';
     MatButtonModule, 
     DatePipe, 
     CurrencyPipe, 
-    MatTableModule,
-    MatPaginator,
-    MatSort
+    MatPaginatorModule,
+    MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    FormsModule
   ],
   templateUrl: './transaction-list.component.html',
   styleUrls: ['./transaction-list.component.scss']
 })
-export class TransactionListComponent implements OnInit {
+export class TransactionListComponent implements AfterViewInit  {
   displayedColumns = ['date', 'store', 'description', 'category', 'amount'];
   dataSource = new MatTableDataSource<Transaction>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+
+  textFilter = '';
+  startDate: Date | null = null;
+  endDate: Date | null = null;        
 
   transactions: Transaction[] = [];
 
@@ -46,6 +59,7 @@ export class TransactionListComponent implements OnInit {
   load(): void {
     this.txService.getTransactions().then(list => {
         this.transactions = list;
+        this.dataSource.data = this.transactions;
     });
   }
 
@@ -58,10 +72,59 @@ export class TransactionListComponent implements OnInit {
 
     this.dataSource.sort = this.sort;
 
-    // Default sort: newest first
-    this.sort.active = 'date';
-    this.sort.direction = 'desc';
-    this.sort.sortChange.emit();
+    // Custom sorting for nested fields + date parsing
+    this.dataSource.sortingDataAccessor = (item: Transaction, property: string) => {
+      switch (property) {
+
+        case 'date':
+          // Force local date parsing to avoid timezone shifts
+          return new Date(item.date + 'T00:00:00').getTime();
+
+        case 'category':
+          // Sort by nested subtype
+          return item.Categories?.subtype?.toLowerCase() ?? '';
+
+        case 'amount':
+          return item.amount;
+
+        case 'store':
+          return item.store?.toLowerCase() ?? '';
+
+        case 'description':
+          return item.description?.toLowerCase() ?? '';
+
+        default:
+          return (item as any)[property];
+      }
+    };
+
+    this.dataSource.filterPredicate = (item: Transaction, filter: string) => {
+      
+      // 1. TEXT FILTER
+      const matchesText =
+        item.store.toLowerCase().includes(this.textFilter) ||
+        item.description?.toLowerCase().includes(this.textFilter) ||
+        item.Categories?.subtype?.toLowerCase().includes(this.textFilter) ||
+        item.amount.toString().includes(this.textFilter);
+
+      if (!matchesText) return false;
+
+      // 2. DATE RANGE FILTER
+      const itemDate = new Date(item.date + 'T00:00:00');
+
+      if (this.startDate && itemDate < this.startDate) return false;
+      if (this.endDate && itemDate > this.endDate) return false;
+
+      return true;
+    };    
   }
 
+  applyTextFilter(event: any) {
+    this.textFilter = event.target.value.trim().toLowerCase();
+    this.dataSource.filter = Math.random().toString(); // trigger filterPredicate
+  }
+
+  applyDateFilter() {
+    this.dataSource.filter = Math.random().toString(); // trigger filterPredicate
+  }
 }

@@ -15,4 +15,16 @@ export class CategoryService {
     console.debug('Got Categories:', data.length);
     return data as Category[];
   }
+
+  async getCategoryIdBySubtype(subtype: string): Promise<number | null> {
+    const { data, error } = await supabase
+      .from('Categories')
+      .select('id')
+      .eq('subtype', subtype)
+      .single();
+
+    if (error) return null;
+    return data?.id ?? null;
+  }
+
 }

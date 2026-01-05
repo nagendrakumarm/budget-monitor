@@ -5,8 +5,34 @@
       Add Transaction
     </button>
   </mat-card-title>
+
+<div class="filters" style="display: flex; gap: 16px; margin-bottom: 16px;">
+  <!-- Text Search -->
+  <mat-form-field appearance="outline">
+    <mat-label>Search</mat-label>
+    <input matInput (keyup)="applyTextFilter($event)" placeholder="Search transactions">
+  </mat-form-field>
+
+  <!-- Start Date -->
+  <mat-form-field appearance="outline">
+    <mat-label>Start Date</mat-label>
+    <input matInput [matDatepicker]="startPicker" (dateChange)="applyDateFilter()" [(ngModel)]="startDate">
+    <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+    <mat-datepicker #startPicker></mat-datepicker>
+  </mat-form-field>
+
+  <!-- End Date -->
+  <mat-form-field appearance="outline">
+    <mat-label>End Date</mat-label>
+    <input matInput [matDatepicker]="endPicker" (dateChange)="applyDateFilter()" [(ngModel)]="endDate">
+    <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+    <mat-datepicker #endPicker></mat-datepicker>
+  </mat-form-field>
+
+</div>
+
   <mat-card-content>
-    <table mat-table [dataSource]="transactions" class="mat-elevation-z2 full-width" matSort>
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z2 full-width" matSort>
 
       <ng-container matColumnDef="date">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
@@ -30,8 +56,8 @@
         <td mat-cell *matCellDef="let row">{{ row.Categories.subtype }}</td>
       </ng-container>
 
-      <ng-container matColumnDef="amount" mat-sort-header>
-        <th mat-header-cell *matHeaderCellDef>Amount</th>
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
         <td mat-cell *matCellDef="let row">
           {{ row.amount | currency }}
         </td>
