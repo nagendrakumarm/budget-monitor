@@ -21,7 +21,12 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="card">
+  <mat-card 
+    class="card" 
+    [routerLink]="['/transactions']"
+    [queryParams]="{ categoryType: 1 }"
+    style="cursor: pointer;"
+  >
     <mat-card-title>Needs</mat-card-title>
     <mat-card-content>
       <h2>{{ totalNeeds | currency }}</h2>
@@ -29,7 +34,12 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="card">
+  <mat-card 
+    class="card" 
+    [routerLink]="['/transactions']"
+    [queryParams]="{ categoryType: 2 }"
+    style="cursor: pointer;"
+  >
     <mat-card-title>Wants</mat-card-title>
     <mat-card-content>
       <h2>{{ totalWants | currency }}</h2>
@@ -37,7 +47,12 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="card">
+  <mat-card 
+    class="card" 
+    [routerLink]="['/transactions']"
+    [queryParams]="{ categoryType: 3 }"
+    style="cursor: pointer;"
+  >
     <mat-card-title>Investments</mat-card-title>
     <mat-card-content>
       <h2>{{ totalInvestments | currency }}</h2>

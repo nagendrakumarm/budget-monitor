@@ -59,14 +59,9 @@ export class AddTransactionComponent implements OnInit {
   }
 
   async submit() {
-    console.log(this.form.invalid);
-    console.debug(this.form.invalid);
     if (this.form.invalid) return;
 
     const value = this.form.value;
-
-    console.log(value.date);
-    console.debug(value.date);
 
     const tx = {
       date: (value.date as Date).toISOString().split('T')[0],

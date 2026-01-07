@@ -6,13 +6,14 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-transaction-list',
@@ -29,6 +30,8 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatSelectModule,
+    MatOptionModule,
     FormsModule
   ],
   templateUrl: './transaction-list.component.html',
@@ -43,21 +46,30 @@ export class TransactionListComponent implements AfterViewInit  {
 
   textFilter = '';
   startDate: Date | null = null;
-  endDate: Date | null = null;        
+  endDate: Date | null = null;      
+  selectedCategoryType: string = '';
+  categoryTypes: string[] = ['Expense', 'Income', 'Transfer']; // or dynamic  
 
   transactions: Transaction[] = [];
 
   constructor(
     private txService: TransactionService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.load();
+    this.route.queryParams.subscribe(params => {
+      const categoryType = params['categoryType']
+        ? Number(params['categoryType'])
+        : undefined;
+      
+      this.load(categoryType);
+    });
   }
 
-  load(): void {
-    this.txService.getTransactions().then(list => {
+  load(categoryType?: number): void {
+    this.txService.getTransactions(categoryType).then(list => {
         this.transactions = list;
         this.dataSource.data = this.transactions;
     });
@@ -127,4 +139,9 @@ export class TransactionListComponent implements AfterViewInit  {
   applyDateFilter() {
     this.dataSource.filter = Math.random().toString(); // trigger filterPredicate
   }
+
+  applyCategoryTypeFilter() {
+    this.load();
+  }  
+  
 }

@@ -1,11 +1,20 @@
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
 }
 
-.card {
-  text-align: center;
+@media (max-width: 600px) {
+  .card {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+mat-card-title {
+  height: 56px;
+  display: flex;
+  align-items: center;
 }
 
 mat-card {

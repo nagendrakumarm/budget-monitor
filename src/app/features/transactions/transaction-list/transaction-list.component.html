@@ -1,76 +1,87 @@
-<mat-card>
-  <mat-card-title>
-    Transactions
-    <button mat-raised-button color="primary" style="margin-left: 16px;" (click)="addNew()">
-      Add Transaction
-    </button>
+<mat-card class="transactions-card">
+
+  <mat-card-title class="header">
+    <span>Transactions</span>
+    <button mat-raised-button color="primary" (click)="addNew()">Add Transaction</button>
   </mat-card-title>
 
-<div class="filters" style="display: flex; gap: 16px; margin-bottom: 16px;">
-  <!-- Text Search -->
-  <mat-form-field appearance="outline">
-    <mat-label>Search</mat-label>
-    <input matInput (keyup)="applyTextFilter($event)" placeholder="Search transactions">
-  </mat-form-field>
+  <!-- Filters -->
+  <div class="filters">
 
-  <!-- Start Date -->
-  <mat-form-field appearance="outline">
-    <mat-label>Start Date</mat-label>
-    <input matInput [matDatepicker]="startPicker" (dateChange)="applyDateFilter()" [(ngModel)]="startDate">
-    <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-    <mat-datepicker #startPicker></mat-datepicker>
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Search</mat-label>
+      <input matInput (keyup)="applyTextFilter($event)" placeholder="Search transactions">
+    </mat-form-field>
 
-  <!-- End Date -->
-  <mat-form-field appearance="outline">
-    <mat-label>End Date</mat-label>
-    <input matInput [matDatepicker]="endPicker" (dateChange)="applyDateFilter()" [(ngModel)]="endDate">
-    <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-    <mat-datepicker #endPicker></mat-datepicker>
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Start Date</mat-label>
+      <input matInput [matDatepicker]="startPicker" (dateChange)="applyDateFilter()" [(ngModel)]="startDate">
+      <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+      <mat-datepicker #startPicker></mat-datepicker>
+    </mat-form-field>
 
-</div>
+    <mat-form-field appearance="outline">
+      <mat-label>End Date</mat-label>
+      <input matInput [matDatepicker]="endPicker" (dateChange)="applyDateFilter()" [(ngModel)]="endDate">
+      <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+      <mat-datepicker #endPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Category Type</mat-label>
+      <mat-select [(value)]="selectedCategoryType" (selectionChange)="applyCategoryTypeFilter()">
+        <mat-option value="">All</mat-option>
+        <mat-option *ngFor="let type of categoryTypes" [value]="type">{{ type }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  </div>
 
   <mat-card-content>
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z2 full-width" matSort>
 
-      <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-        <td mat-cell *matCellDef="let row">
-          {{ row.date | date:'shortDate' }}
-        </td>
-      </ng-container>
+    <div class="table-container">
+      <table mat-table [dataSource]="dataSource" matSort class="styled-table">
 
-      <ng-container matColumnDef="store">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Store</th>
-        <td mat-cell *matCellDef="let row">{{ row.store }}</td>
-      </ng-container>
+        <!-- Date -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+          <td mat-cell *matCellDef="let row">{{ row.date | date:'shortDate' }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="description">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
-        <td mat-cell *matCellDef="let row">{{ row.description }}</td>
-      </ng-container>
+        <!-- Store -->
+        <ng-container matColumnDef="store">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Store</th>
+          <td mat-cell *matCellDef="let row">{{ row.store }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="category">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
-        <td mat-cell *matCellDef="let row">{{ row.Categories.subtype }}</td>
-      </ng-container>
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
+          <td mat-cell *matCellDef="let row">{{ row.description }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="amount">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
-        <td mat-cell *matCellDef="let row">
-          {{ row.amount | currency }}
-        </td>
-      </ng-container>
+        <!-- Category -->
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+          <td mat-cell *matCellDef="let row">{{ row.Categories?.subtype }}</td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+        <!-- Amount -->
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
+          <td mat-cell *matCellDef="let row" class="amount-cell">
+            {{ row.amount | currency }}
+          </td>
+        </ng-container>
 
-    <mat-paginator
-        [pageSize]="10"
-        [pageSizeOptions]="[5, 10, 25, 50]">
-    </mat-paginator>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      </table>
+    </div>
+
+    <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50]" showFirstLastButtons></mat-paginator>
 
   </mat-card-content>
+
 </mat-card>

@@ -3,11 +3,12 @@ import { Transaction } from '../../core/models/transaction.model';
 import { TransactionService } from '../../core/services/transaction.service';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule, CurrencyPipe, PercentPipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatCardModule, CurrencyPipe, PercentPipe, CommonModule],
+  imports: [MatCardModule, CurrencyPipe, PercentPipe, CommonModule, RouterModule], 
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
@@ -69,9 +70,9 @@ export class DashboardComponent implements OnInit {
       .filter(t => t.Categories?.type === 3)
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    this.needsPct = this.totalIncome ? (this.totalNeeds / this.totalIncome) * 100 : 0;
-    this.wantsPct = this.totalIncome ? (this.totalWants / this.totalIncome) * 100 : 0;
-    this.investmentsPct = this.totalIncome ? (this.totalInvestments / this.totalIncome) * 100 : 0;
-    this.expensePct = this.totalIncome ? (this.totalExpenses/this.totalIncome) * 100 : 0;
+    this.needsPct = this.totalIncome ? (this.totalNeeds / this.totalIncome) : 0;
+    this.wantsPct = this.totalIncome ? (this.totalWants / this.totalIncome) : 0
+    this.investmentsPct = this.totalIncome ? (this.totalInvestments / this.totalIncome) : 0;
+    this.expensePct = this.totalIncome ? (this.totalExpenses/this.totalIncome) : 0;
     }
 }
