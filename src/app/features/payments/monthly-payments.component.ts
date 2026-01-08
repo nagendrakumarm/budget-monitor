@@ -77,14 +77,14 @@ export class MonthlyPaymentsComponent implements OnInit {
   async addPayment() {
 
     const value = this.form.getRawValue();
-
+    console.log(value);
     const tx = {
       account_id: value.accountId,
       amount: value.amount,
       month: value.month,
       is_paid: false
     };
-
+    console.log(tx.month);
     this.service.addPayment(tx).then(() => {
         this.snackBar.open('Payment saved successfully', 'Close', {
           duration: 3000,
@@ -108,7 +108,7 @@ export class MonthlyPaymentsComponent implements OnInit {
   }
 
   loadPayments() {
-    this.service.getPayments(this.formatMonth(new Date()))
+    this.service.getPayments(this.currentMonth)
       .then(data => {
         this.payments = data;
 
@@ -129,6 +129,20 @@ export class MonthlyPaymentsComponent implements OnInit {
         });    
       });
   }  
+
+  goToPreviousMonthPayments() {
+    const [year, month] = this.currentMonth.split('-').map(Number);
+    const date = new Date(year, month - 2); // subtract 1 month (JS months are 0-based)
+    this.currentMonth = this.formatMonth(date);
+    this.loadPayments();
+  }
+
+  goToNextMonthPayments() {
+    const [year, month] = this.currentMonth.split('-').map(Number);
+    const date = new Date(year, month); // add 1 month
+    this.currentMonth = this.formatMonth(date);
+    this.loadPayments()
+  }
   edit(payment: MonthlyPayment) {
     this.editing = { ...payment };
   }
@@ -173,13 +187,17 @@ export class MonthlyPaymentsComponent implements OnInit {
   goToPreviousMonth() {
     const [year, month] = this.currentMonth.split('-').map(Number);
     const date = new Date(year, month - 2); // subtract 1 month (JS months are 0-based)
-    this.currentMonth = this.formatMonth(date);
+    this.form.patchValue({
+      month: this.formatMonth(date)
+    });    
   }
 
   goToNextMonth() {
     const [year, month] = this.currentMonth.split('-').map(Number);
     const date = new Date(year, month); // add 1 month
-    this.currentMonth = this.formatMonth(date);
+    this.form.patchValue({
+      month: this.formatMonth(date)
+    });    
   }
 
 }
