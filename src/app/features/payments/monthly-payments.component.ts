@@ -67,7 +67,6 @@ export class MonthlyPaymentsComponent implements OnInit {
     });
     this.loadPayments();
     this.accounts = await this.service.getAccounts();
-    console.log('Accounts: ', this.accounts.length );
   }
 
   async submit() {
@@ -112,7 +111,7 @@ export class MonthlyPaymentsComponent implements OnInit {
     this.service.getPayments(this.formatMonth(new Date()))
       .then(data => {
         this.payments = data;
-        
+
         this.totalPayments = data.reduce((sum, p) => sum + p.amount, 0);
 
         this.totalPaid = data
@@ -123,6 +122,11 @@ export class MonthlyPaymentsComponent implements OnInit {
           .filter(p => !p.is_paid)
           .reduce((sum, p) => sum + p.amount, 0);
           
+        this.payments.sort((a, b) => {
+          const dateA = Number(a.Accounts?.duedate);
+          const dateB = Number(b.Accounts?.duedate);
+          return dateA - dateB;
+        });    
       });
   }  
   edit(payment: MonthlyPayment) {
@@ -142,6 +146,7 @@ export class MonthlyPaymentsComponent implements OnInit {
 
   async togglePaid(payment: any) {
     await this.service.togglePaid(payment);
+    this.loadPayments();
   }  
 
   async delete(id: number) {

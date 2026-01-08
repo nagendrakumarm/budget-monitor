@@ -55,8 +55,6 @@ export class MonthlyPaymentsService {
             : t.account_id
     }));
 
-    console.log('Mounth: ', month);
-    console.log('Payments: ', data);
     return normalized as MonthlyPayment[];
   }
 
@@ -125,17 +123,24 @@ export class MonthlyPaymentsService {
     return normalized as PaymentAccount[];
   }
 
-  async togglePaid(payment: any) {
-    console.log('Payment: ', payment);
-    console.log.apply('Paid: ', payment.is_paid);
-    const { error } = await supabase
+  async togglePaid(payment: MonthlyPayment) {
+    console.log('Payment: ', payment.id);
+    const { data, error, count } = await supabase
       .from('monthly_payments')
       .update({ is_paid: !payment.is_paid })
-      .eq('id', payment.id);
+      .eq('id', payment.id)
+      .select('*');
 
-    if (!error) {
+    console.log('ID value:', payment.id, 'Type:', typeof payment.id);
+
+    if (error) {
+      console.error('Toggle failed:', error);
+      return;
+    } else if (data.length === 0) {
+      console.warn('No rows matched the filter. ID may be wrong or RLS blocked it.');
+    } else {
       payment.is_paid = !payment.is_paid;
-      console.log('Error toglle: ', error);
+      console.log('Toggle success: ', data[0]);
     }
   }  
 }
