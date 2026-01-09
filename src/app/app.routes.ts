@@ -5,10 +5,18 @@ import { AddTransactionComponent } from '../app/features/transactions/add-transa
 import { TransactionUploadComponent } from './features/transactions/upload/upload.component';
 import { MonthlyTableComponent } from './features/transactions/transaction-list/monthly-table.component';
 import { MonthlyPaymentsComponent } from './features/payments/monthly-payments.component';
+import { LoginComponent } from './features/login/login.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent },
+  { path: 'login', component: LoginComponent },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('../app/features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [authGuard]
+  },
   { path: 'transactions', component: TransactionListComponent },
   { path: 'transactions/new', component: AddTransactionComponent },
   { path: 'upload', component: TransactionUploadComponent },
