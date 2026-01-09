@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,11 @@ export class LoginComponent implements OnInit{
   loading = false;
   form!: FormGroup;
 
-  constructor(private fb: FormBuilder, private auth: AuthService) {}
+  constructor(
+    private fb: FormBuilder, 
+    private auth: AuthService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     this.form = this.fb.group({
@@ -31,21 +36,19 @@ export class LoginComponent implements OnInit{
     });
   }
 
-  async login() {
-    if (this.form.invalid) return;
+async login() {
+  if (this.form.invalid) return;
 
-    this.loading = true;
+  this.loading = true;
 
-    const { email, password } = this.form.value;
-    console.log(email, " : ", password);
-    const { error } = await this.auth.login(email!, password!);
+  const { email, password } = this.form.value;
+  const { error } = await this.auth.login(email!, password!);
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    // redirect to dashboard
-    window.location.href = '/dashboard';
+  if (error) {
+    alert(error.message);
+    return;
   }
+
+  this.router.navigate(['dashboard']);
+}
 }
