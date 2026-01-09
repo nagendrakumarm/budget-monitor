@@ -1,10 +1,10 @@
 <header class="header">
   <h2>Dashboard</h2>
-  <!--button (click)="logout()">Logout</button-->
 </header>
 
-<!-- rest of your dashboard -->
 <div class="dashboard-grid">
+
+  <!-- Monthly Income -->
   <mat-card class="card">
     <mat-card-title>Monthly Income</mat-card-title>
     <mat-card-content>
@@ -12,13 +12,19 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="card" [class.positive-bg]="netCash >= 0" [class.negative-bg]="netCash < 0">
+  <!-- Net Cashflow -->
+  <mat-card 
+    class="card"
+    [class.positive-bg]="netCash >= 0"
+    [class.negative-bg]="netCash < 0"
+  >
     <mat-card-title>Net Cashflow</mat-card-title>
     <mat-card-content>
       <h2>{{ netCash | currency }}</h2>
     </mat-card-content>
   </mat-card>
 
+  <!-- Monthly Expenses -->
   <mat-card class="card">
     <mat-card-title>Monthly Expenses</mat-card-title>
     <mat-card-content>
@@ -27,11 +33,11 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card 
-    class="card" 
+  <!-- Needs -->
+  <mat-card
+    class="card clickable"
     [routerLink]="['/transactions']"
     [queryParams]="{ categoryType: 1 }"
-    style="cursor: pointer;"
   >
     <mat-card-title>Needs</mat-card-title>
     <mat-card-content>
@@ -40,11 +46,11 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card 
-    class="card" 
+  <!-- Wants -->
+  <mat-card
+    class="card clickable"
     [routerLink]="['/transactions']"
     [queryParams]="{ categoryType: 2 }"
-    style="cursor: pointer;"
   >
     <mat-card-title>Wants</mat-card-title>
     <mat-card-content>
@@ -53,11 +59,11 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card 
-    class="card" 
+  <!-- Investments -->
+  <mat-card
+    class="card clickable"
     [routerLink]="['/transactions']"
     [queryParams]="{ categoryType: 3 }"
-    style="cursor: pointer;"
   >
     <mat-card-title>Investments</mat-card-title>
     <mat-card-content>
@@ -65,4 +71,5 @@
       <h4>{{ investmentsPct | percent }}</h4>
     </mat-card-content>
   </mat-card>
+
 </div>

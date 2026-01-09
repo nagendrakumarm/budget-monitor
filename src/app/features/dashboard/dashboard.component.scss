@@ -1,24 +1,51 @@
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
+.header {
+  padding: 16px;
+  background: #1976d2;
+  color: white;
+  text-align: center;
 }
 
-@media (max-width: 600px) {
-  .card {
-    padding: 12px;
-    font-size: 14px;
+.dashboard-grid {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+
+  /* Mobile-first layout */
+  grid-template-columns: 1fr;
+}
+
+/* Tablet layout */
+@media (min-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-mat-card-title {
-  height: 56px;
-  display: flex;
-  align-items: center;
+/* Desktop layout */
+@media (min-width: 960px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-mat-card {
-  padding: 8px;
+.main-content {
+  width: 100%;
+  max-width: 100%;
+}
+
+.card {
+  padding: 12px;
+  text-align: center;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clickable:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .positive-bg {

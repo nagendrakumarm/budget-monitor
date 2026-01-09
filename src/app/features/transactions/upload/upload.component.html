@@ -1,5 +1,8 @@
-<input type="file" (change)="onFileSelected($event)" accept=".xlsx,.xls" />
+<div class="page-container">
+  <h2>Upload Transactions</h2>
+  <input type="file" (change)="onFileSelected($event)" accept=".xlsx,.xls" />
 
-<button (click)="upload()" [disabled]="!rawTransactions.length">
-  Upload Transactions
-</button>
+  <button (click)="upload()" [disabled]="!rawTransactions.length">
+    Upload Transactions
+  </button>
+</div>
