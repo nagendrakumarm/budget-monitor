@@ -1,4 +1,14 @@
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
 .full-width {
-  width: 100%;
-  margin-bottom: 12px;
+  grid-column: span 2;
+}
+
+.action-row {
+  grid-column: span 3;
+  margin-top: 12px;
 }

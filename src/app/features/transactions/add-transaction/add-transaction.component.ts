@@ -74,7 +74,7 @@ export class AddTransactionComponent implements OnInit {
 
     try {
       await this.txService.addTransaction(tx).then(() => {
-        this.router.navigate(['/Transactions']);
+        this.router.navigate(['/transactions']);
       });
     }
     catch (err) {
