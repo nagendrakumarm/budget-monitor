@@ -1,7 +1,7 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
 import { Transaction } from '../../../core/models/transaction.model';
 import { TransactionService } from '../../../core/services/transaction.service';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource, MatTable } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
@@ -43,6 +43,7 @@ export class TransactionListComponent implements AfterViewInit  {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatTable) table!: MatTable<any>;
 
   textFilter = '';
   startDate: Date | null = null;
@@ -69,7 +70,8 @@ export class TransactionListComponent implements AfterViewInit  {
   }
 
   load(categoryType?: number): void {
-    this.txService.getTransactions(categoryType).then(list => {
+    const types = categoryType ? [categoryType] : [1, 2, 3, 5];
+    this.txService.getTransactions(types).then(list => {
         this.transactions = list;
         this.dataSource.data = this.transactions;
     });
@@ -144,4 +146,23 @@ export class TransactionListComponent implements AfterViewInit  {
     this.load();
   }  
   
+  getTotalAmount(): number {
+    if (!this.dataSource || !this.dataSource.filteredData) return 0;
+
+    return this.dataSource.filteredData
+      .reduce((sum, item) => sum + (item.amount || 0), 0);
+  }  
+
+  getCurrentPageTotal(): number {
+    if (!this.table) return 0;
+
+    const renderedData = (this.table.dataSource as MatTableDataSource<any>)
+      .filteredData
+      .slice(
+        this.paginator.pageIndex * this.paginator.pageSize,
+        (this.paginator.pageIndex + 1) * this.paginator.pageSize
+      );
+
+    return renderedData.reduce((sum, item) => sum + (item.amount || 0), 0);
+  }
 }

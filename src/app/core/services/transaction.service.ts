@@ -5,7 +5,7 @@ import { Transaction, MonthlySummary } from '../models/transaction.model';
 @Injectable({ providedIn: 'root' })
 export class TransactionService {
 
-  async getTransactions(categoryType?: number): Promise<Transaction[]> {
+  async getTransactions(categoryTypes?: number[]): Promise<Transaction[]> {
     let query = supabase
       .from('Transactions')
       .select(`
@@ -23,8 +23,8 @@ export class TransactionService {
       `)
       .order('date', { ascending: false });
 
-    if (categoryType) {
-      query = query.eq('Categories.type', categoryType);
+    if(categoryTypes) {
+      query = query.in('Categories.type', categoryTypes);
     }
     
     const {data, error} = await query;
