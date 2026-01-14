@@ -30,12 +30,10 @@ export class DashboardComponent implements OnInit {
   constructor(private txService: TransactionService, private auth: AuthService) {}
 
   ngOnInit(): void {
-    this.txService.getTransactions().then(list => {
+    this.txService.getThisMonthTransactions().then(list => {
         this.transactions = list;
         this.calculate();
     });
-
-    console.log('Transactions:', this.transactions);
   }
 
   logout() {
@@ -43,35 +41,27 @@ export class DashboardComponent implements OnInit {
     window.location.href = '/login';
   }
   private calculate(): void {
-    const now = new Date();
-    const month = now.getMonth();
-    const year = now.getFullYear();
-
-    const monthTx = this.transactions.filter(t => {
-      const d = new Date(t.date + 'T00:00:00');
-      return d.getMonth() === month && d.getFullYear() === year;
-    });
-
-    this.totalIncome = monthTx
+ 
+    this.totalIncome = this.transactions
       .filter(t => t.Categories?.type === 4)
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
 
-    this.totalExpenses = monthTx
+    this.totalExpenses = this.transactions
       .filter(t => t.Categories && [1, 2, 3].includes(t.Categories.type))
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
     this.netCash = this.totalIncome - this.totalExpenses;
 
-    this.totalNeeds = monthTx
+    this.totalNeeds = this.transactions
       .filter(t => t.Categories?.type === 1)
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    this.totalWants = monthTx
+    this.totalWants = this.transactions
       .filter(t => t.Categories?.type === 2)
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    this.totalInvestments = monthTx
+    this.totalInvestments = this.transactions
       .filter(t => t.Categories?.type === 3)
       .reduce((sum, t) => sum + Number(t.amount), 0);
 

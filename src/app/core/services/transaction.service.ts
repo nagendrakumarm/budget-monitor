@@ -1,11 +1,29 @@
 import { Injectable } from '@angular/core';
 import { supabase } from '../supabase.client';
 import { Transaction, MonthlySummary } from '../models/transaction.model';
+import { start } from 'node:repl';
 
 @Injectable({ providedIn: 'root' })
 export class TransactionService {
 
-  async getTransactions(categoryTypes?: number[]): Promise<Transaction[]> {
+  async getThisMonthTransactions(categoryTypes?: number[]): Promise<Transaction[]> {
+    const now = new Date();
+
+    // First day of this month
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      .toISOString()
+      .split('T')[0];
+
+    // Last day of this month
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+      .toISOString()
+      .split('T')[0];
+
+    console.log('Main: ', categoryTypes);
+    return this.getTransactions(categoryTypes, startOfMonth, endOfMonth);
+  }
+
+  async getTransactions(categoryTypes?: number[], startDate?: String, endDate?: String): Promise<Transaction[]> {
     let query = supabase
       .from('Transactions')
       .select(`
@@ -23,8 +41,16 @@ export class TransactionService {
       `)
       .order('date', { ascending: false });
 
-    if(categoryTypes) {
+    if(categoryTypes && categoryTypes.length > 0) {
       query = query.in('Categories.type', categoryTypes);
+    }
+
+    if(startDate) {
+      query.gte('date', startDate);
+    }
+
+    if(endDate) {
+      query.lte('date', endDate);
     }
     
     const {data, error} = await query;

@@ -5,7 +5,11 @@
 <div class="dashboard-grid">
 
   <!-- Monthly Income -->
-  <mat-card class="card">
+  <mat-card
+    class="card clickable"
+    [routerLink]="['/transactions']"
+    [queryParams]="{ categoryTypes: [4] }"
+  >
     <mat-card-title>Monthly Income</mat-card-title>
     <mat-card-content>
       <h2>{{ totalIncome | currency }}</h2>
@@ -25,7 +29,11 @@
   </mat-card>
 
   <!-- Monthly Expenses -->
-  <mat-card class="card">
+  <mat-card
+    class="card clickable"
+    [routerLink]="['/transactions']"
+    [queryParams]="{ categoryTypes: [1, 2, 3, 5] }"
+  >
     <mat-card-title>Monthly Expenses</mat-card-title>
     <mat-card-content>
       <h2>{{ totalExpenses | currency }}</h2>
@@ -37,7 +45,7 @@
   <mat-card
     class="card clickable"
     [routerLink]="['/transactions']"
-    [queryParams]="{ categoryType: 1 }"
+    [queryParams]="{ categoryTypes: [1] }"
   >
     <mat-card-title>Needs</mat-card-title>
     <mat-card-content>
@@ -50,7 +58,7 @@
   <mat-card
     class="card clickable"
     [routerLink]="['/transactions']"
-    [queryParams]="{ categoryType: 2 }"
+    [queryParams]="{ categoryTypes: [2] }"
   >
     <mat-card-title>Wants</mat-card-title>
     <mat-card-content>
@@ -63,7 +71,7 @@
   <mat-card
     class="card clickable"
     [routerLink]="['/transactions']"
-    [queryParams]="{ categoryType: 3 }"
+    [queryParams]="{ categoryTypes: [3] }"
   >
     <mat-card-title>Investments</mat-card-title>
     <mat-card-content>

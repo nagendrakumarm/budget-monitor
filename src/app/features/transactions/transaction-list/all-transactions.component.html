@@ -1,12 +1,7 @@
 <div class="page-container">
-  <h2>This Month Transactions</h2>
+  <h2>All Transactions</h2>
 
   <mat-card class="transactions-card">
-
-    <mat-card-title class="header">
-      <span>Transactions</span>
-      <button mat-raised-button color="primary" (click)="addNew()">Add Transaction</button>
-    </mat-card-title>
 
     <!-- Filters -->
     <div class="filters">
@@ -18,26 +13,31 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Start Date</mat-label>
-        <input matInput [matDatepicker]="startPicker" (dateChange)="applyDateFilter()" [(ngModel)]="startDate">
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate">
         <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
         <mat-datepicker #startPicker></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>End Date</mat-label>
-        <input matInput [matDatepicker]="endPicker" (dateChange)="applyDateFilter()" [(ngModel)]="endDate">
+        <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate">
         <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
         <mat-datepicker #endPicker></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Category Type</mat-label>
-        <mat-select [(value)]="selectedCategoryType" (selectionChange)="applyCategoryTypeFilter()">
-          <mat-option value="">All</mat-option>
-          <mat-option *ngFor="let type of categoryTypes" [value]="type">{{ type }}</mat-option>
+        <mat-label>Category Types</mat-label>
+        <mat-select multiple [(ngModel)]="selectedTypes">
+            <mat-option *ngFor="let t of categoryTypes" [value]="t.value">
+            {{ t.label }}
+            </mat-option>
         </mat-select>
       </mat-form-field>
 
+    <button mat-raised-button color="primary" (click)="search()">
+        Search
+    </button>
+    
     </div>
 
     <mat-card-content>

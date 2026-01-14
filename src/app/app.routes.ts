@@ -7,6 +7,7 @@ import { MonthlyTableComponent } from './features/transactions/transaction-list/
 import { MonthlyPaymentsComponent } from './features/payments/monthly-payments.component';
 import { LoginComponent } from './features/login/login.component';
 import { authGuard } from './core/guards/auth.guard';
+import { AllTransactionsComponent } from './features/transactions/transaction-list/all-transactions.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -22,5 +23,6 @@ export const routes: Routes = [
   { path: 'upload', component: TransactionUploadComponent },
   { path: 'payments', component: MonthlyPaymentsComponent },
   { path: 'monthly', component: MonthlyTableComponent },
+  { path: 'alltransactions', component: AllTransactionsComponent },
   { path: '**', redirectTo: 'dashboard' }
 ];

@@ -1,4 +1,4 @@
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { Transaction } from '../../../core/models/transaction.model';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { MatTableModule, MatTableDataSource, MatTable } from '@angular/material/table';
@@ -16,7 +16,7 @@ import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
-  selector: 'app-transaction-list',
+  selector: 'all-transactions',
   standalone: true,
   imports: [
     CommonModule,
@@ -35,10 +35,10 @@ import { MatSelectModule } from '@angular/material/select';
     MatOptionModule,
     FormsModule
   ],
-  templateUrl: './transaction-list.component.html',
-  styleUrls: ['./transaction-list.component.scss']
+  templateUrl: './all-transactions.component.html',
+  styleUrls: ['./all-transactions.component.scss']
 })
-export class TransactionListComponent implements AfterViewInit  {
+export class AllTransactionsComponent implements OnInit, AfterViewInit  {
   displayedColumns = ['date', 'store', 'description', 'category', 'amount'];
   dataSource = new MatTableDataSource<Transaction>();
 
@@ -49,8 +49,13 @@ export class TransactionListComponent implements AfterViewInit  {
   textFilter = '';
   startDate: Date | null = null;
   endDate: Date | null = null;      
-  selectedCategoryType: string = '';
-  categoryTypes: string[] = ['Expense', 'Income', 'Transfer']; // or dynamic  
+  selectedTypes: number[] = [];
+  categoryTypes = [
+    { value: 1, label: 'Expense' },
+    { value: 2, label: 'Income' },
+    { value: 3, label: 'Transfer' },
+    { value: 4, label: 'Credit Card' }
+  ];
 
   transactions: Transaction[] = [];
 
@@ -62,22 +67,48 @@ export class TransactionListComponent implements AfterViewInit  {
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
-      const categoryTypes = params.getAll('categoryTypes')
+      const types = params.getAll('categoryTypes')
         .map(Number)
         .filter(x => !isNaN(x));
       
-      this.load(categoryTypes);
+      this.selectedTypes = types; 
+      this.load(types);
+    });
+
+    console.log('selectedTypes:', this.selectedTypes);
+    console.log('Types:', this.categoryTypes);
+
+  }
+
+  search() {
+    const params: any = {};
+    console.log('Start: ', this.startDate);
+    if (this.startDate) {
+      params.startDate = this.startDate.toISOString().split('T')[0];
+    }
+
+    if (this.endDate) {
+      params.endDate = this.endDate.toISOString().split('T')[0];
+    }
+
+    if (this.selectedTypes.length > 0) {
+      params.categoryTypes = this.selectedTypes;
+    }
+
+    //this.router.navigate(['/transactions'], { queryParams: params });
+
+    this.txService.getTransactions([], params.startDate, params.endDate).then(list => {
+        this.transactions = list;
+        this.dataSource.data = this.transactions;
     });
   }
 
   load(categoryTypes?: number[]): void {
-    console.log('Before: ', categoryTypes);
-    const types = categoryTypes && categoryTypes.length != 0? categoryTypes : [1, 2, 3, 5];
-    console.log('After: ', types);
-    this.txService.getThisMonthTransactions(types).then(list => {
+    /*const types = categoryTypes && categoryTypes.length != 0? categoryTypes : [1, 2, 3, 5];
+    this.txService.getTransactions(types).then(list => {
         this.transactions = list;
         this.dataSource.data = this.transactions;
-    });
+    });*/
   }
 
   addNew(): void {
