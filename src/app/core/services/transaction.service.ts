@@ -78,6 +78,46 @@ export class TransactionService {
     }
   }
 
+  async addSubscription(tx: any): Promise<void> {
+    try {
+      // Extract UI-only fields
+      const { isSubscription, months, category, amount, ...rest } = tx;
+
+      // Convert category object → category ID
+      const categoryId = category?.id ?? category;
+
+      // Base transaction object (cleaned)
+      const baseTx = {
+        ...rest,
+        category: categoryId,
+      };
+
+      // Subscription → generate multiple monthly transactions
+      const transactions = [];
+
+      for (let i = 0; i < months; i++) {
+        const newDate = new Date(tx.date);
+        newDate.setMonth(newDate.getMonth() + i);
+
+        transactions.push({
+          ...baseTx,
+          amount: tx.amount / tx.months,
+          date: newDate.toISOString().split('T')[0], // YYYY-MM-DD
+        });
+      }
+
+      const { error } = await supabase
+        .from('Transactions')
+        .insert(transactions);
+
+      if (error) throw error;
+
+    } catch (err) {
+      console.error('Insert failed:', err);
+      throw err;
+    }
+  }
+
   async deleteTransaction(id: string): Promise<void> {
     const { error } = await supabase
       .from('Transactions')

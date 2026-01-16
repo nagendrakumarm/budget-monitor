@@ -34,7 +34,7 @@
         <mat-label>Category Type</mat-label>
         <mat-select [(value)]="selectedCategoryType" (selectionChange)="applyCategoryTypeFilter()">
           <mat-option value="">All</mat-option>
-          <mat-option *ngFor="let type of categoryTypes" [value]="type">{{ type }}</mat-option>
+          <mat-option *ngFor="let type of categoryTypes" [value]="type">{{ type.subtype }}</mat-option>
         </mat-select>
       </mat-form-field>
 

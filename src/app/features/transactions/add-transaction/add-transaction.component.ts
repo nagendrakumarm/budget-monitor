@@ -9,10 +9,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { CurrencyPipe, DatePipe, NgIf } from '@angular/common';
 import { Category } from '../../../core/models/category.model';
 import { CategoryService } from '../../../core/services/category.service';
 import { NgFor } from '@angular/common';
+import { isSubscription } from 'rxjs/internal/Subscription';
 
 @Component({
   selector: 'app-add-transaction',
@@ -26,7 +28,9 @@ import { NgFor } from '@angular/common';
     MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    NgFor
+    MatCheckboxModule,
+    NgFor,
+    NgIf
   ],
   templateUrl: './add-transaction.component.html',
   styleUrls: ['./add-transaction.component.scss']
@@ -50,12 +54,27 @@ export class AddTransactionComponent implements OnInit {
       store: ['', Validators.required],
       description: [''],
       category: ['', Validators.required],
-      amount: [0, Validators.required]
+      amount: ['', Validators.required],
+      isSubscription: [false],
+      months: []
     });
-
+    
     // Load categories from Supabase
     this.categories = await this.categoryService.getCategories();
-    console.debug('Categories:' , this.categories.length);
+    console.log('Categories:' , this.categories.length);
+
+    this.form.get('isSubscription')?.valueChanges.subscribe(isSub => {
+      const monthsControl = this.form.get('months');
+
+      if (isSub) {
+        monthsControl?.setValidators([Validators.required, Validators.min(1)]);
+      } else {
+        monthsControl?.clearValidators();
+        monthsControl?.setValue(null);
+      }
+
+      monthsControl?.updateValueAndValidity();
+    });
   }
 
   async submit() {
@@ -68,17 +87,26 @@ export class AddTransactionComponent implements OnInit {
       store: value.store!,
       description: value.description || '',
       category: value.category.id!,
-      amount: Number(value.amount)
+      amount: Number(value.amount),
+      isSubscription: Boolean(value.isSubscription),
+      months: Number(value.months)
     };
     console.log(':date:', tx.date, ':store:', tx.store, ':description:', tx.description, ':cat:' , tx.category, ':Amt:', tx.amount)
 
     try {
-      await this.txService.addTransaction(tx).then(() => {
-        this.router.navigate(['/transactions']);
-      });
+      if (tx.isSubscription) {
+        await this.txService.addSubscription(tx).then(() => {
+          this.router.navigate(['/transactions']);
+        });
+      } else {
+        await this.txService.addTransaction(tx).then(() => {
+          this.router.navigate(['/transactions']);
+        });
+      }
     }
     catch (err) {
       console.error('Insert failed:', err);
+      alert('Insert failed:'+ err);
     }
   }
 }

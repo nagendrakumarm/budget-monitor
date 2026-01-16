@@ -14,6 +14,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
+import { CategoryService } from '../../../core/services/category.service';
+import { Category } from '../../../core/models/category.model';
 
 @Component({
   selector: 'app-transaction-list',
@@ -50,17 +52,18 @@ export class TransactionListComponent implements AfterViewInit  {
   startDate: Date | null = null;
   endDate: Date | null = null;      
   selectedCategoryType: string = '';
-  categoryTypes: string[] = ['Expense', 'Income', 'Transfer']; // or dynamic  
+  categoryTypes: Category[] = []; // or dynamic  
 
   transactions: Transaction[] = [];
 
   constructor(
     private txService: TransactionService,
+    private categoryService: CategoryService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.route.queryParamMap.subscribe(params => {
       const categoryTypes = params.getAll('categoryTypes')
         .map(Number)
@@ -68,6 +71,10 @@ export class TransactionListComponent implements AfterViewInit  {
       
       this.load(categoryTypes);
     });
+
+    // Load categories from Supabase
+    this.categoryTypes = await this.categoryService.getCategories();
+    console.log('Categories:' , this.categoryTypes);
   }
 
   load(categoryTypes?: number[]): void {

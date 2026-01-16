@@ -28,8 +28,8 @@
       <mat-form-field appearance="outline">
         <mat-label>Category Types</mat-label>
         <mat-select multiple [(ngModel)]="selectedTypes">
-            <mat-option *ngFor="let t of categoryTypes" [value]="t.value">
-            {{ t.label }}
+            <mat-option *ngFor="let t of categoryTypes" [value]="t">
+            {{ t.subtype }}
             </mat-option>
         </mat-select>
       </mat-form-field>

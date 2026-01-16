@@ -41,6 +41,17 @@
           <input matInput type="number" formControlName="amount">
         </mat-form-field>
 
+        <!-- Subscription Checkbox -->
+        <mat-checkbox formControlName="isSubscription">
+          Is Subscription?
+        </mat-checkbox>
+
+        <!-- Months textbox (visible only when checkbox is checked) -->
+        <mat-form-field appearance="outline" *ngIf="form.get('isSubscription')?.value">
+          <mat-label>Number of Months</mat-label>
+          <input matInput type="number" formControlName="months">
+        </mat-form-field>    
+
         <div class="action-row">
           <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
             Save Transaction
