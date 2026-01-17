@@ -58,7 +58,7 @@ export class AddTransactionComponent implements OnInit {
       isSubscription: [false],
       months: []
     });
-    
+
     // Load categories from Supabase
     this.categories = await this.categoryService.getCategories();
     console.log('Categories:' , this.categories.length);
@@ -82,6 +82,8 @@ export class AddTransactionComponent implements OnInit {
 
     const value = this.form.value;
 
+    console.log('Form Sub:', value.isSubscription)
+
     const tx = {
       date: (value.date as Date).toISOString().split('T')[0],
       store: value.store!,
@@ -93,16 +95,11 @@ export class AddTransactionComponent implements OnInit {
     };
     console.log(':date:', tx.date, ':store:', tx.store, ':description:', tx.description, ':cat:' , tx.category, ':Amt:', tx.amount)
 
+    console.log('TX Sub:', tx.isSubscription)
     try {
-      if (tx.isSubscription) {
-        await this.txService.addSubscription(tx).then(() => {
-          this.router.navigate(['/transactions']);
-        });
-      } else {
-        await this.txService.addTransaction(tx).then(() => {
-          this.router.navigate(['/transactions']);
-        });
-      }
+      await this.txService.addTransaction(tx).then(() => {
+        this.router.navigate(['/transactions']);
+      });
     }
     catch (err) {
       console.error('Insert failed:', err);
