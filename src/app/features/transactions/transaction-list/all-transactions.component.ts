@@ -89,13 +89,15 @@ export class AllTransactionsComponent implements OnInit, AfterViewInit  {
       params.endDate = this.endDate.toISOString().split('T')[0];
     }
 
+    console.log("Selected:" , this.selectedTypes);
     if (this.selectedTypes.length > 0) {
       params.categoryTypes = this.selectedTypes;
     }
 
+    console.log("Selected:After, " , params.categoryTypes);
     //this.router.navigate(['/transactions'], { queryParams: params });
 
-    this.txService.getTransactions([], params.startDate, params.endDate).then(list => {
+    this.txService.getTransactions(params.categoryTypes, params.startDate, params.endDate).then(list => {
         this.transactions = list;
         this.dataSource.data = this.transactions;
     });

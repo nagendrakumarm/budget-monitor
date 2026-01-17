@@ -12,3 +12,45 @@ html, body { height: 100%; }
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Default: Desktop grid layout */
+:host ::ng-deep .form-section {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 16px !important;
+}
+
+/* Subscription section spacing */
+.subscription-section {
+  margin-top: 16px;
+}
+
+/* Submit button */
+.submit-btn {
+  width: 200px;
+  margin-top: 20px;
+}
+
+/* ---------- MOBILE VERSION ---------- */
+@media (max-width: 768px) {
+  :host ::ng-deep .form-section {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  :host ::ng-deep .full-width {
+    width: 100% !important;
+  }
+
+  .submit-btn {
+    width: 100% !important;
+  }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 0;
+}

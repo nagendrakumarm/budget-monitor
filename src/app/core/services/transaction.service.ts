@@ -42,7 +42,7 @@ export class TransactionService {
       .order('date', { ascending: false });
 
     if(categoryTypes && categoryTypes.length > 0) {
-      query = query.in('Categories.type', categoryTypes);
+      query = query.in('Categories.id', categoryTypes);
     }
 
     if(startDate) {
@@ -53,6 +53,7 @@ export class TransactionService {
       query.lte('date', endDate);
     }
     
+    console.log("In:" , query);
     const {data, error} = await query;
 
     if (error) throw error;

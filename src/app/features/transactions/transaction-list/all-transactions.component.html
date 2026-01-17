@@ -1,48 +1,48 @@
-<div class="page-container">
+<div class="page-container mobile-transactions">
   <h2>All Transactions</h2>
 
   <mat-card class="transactions-card">
 
     <!-- Filters -->
-    <div class="filters">
+    <div class="filters mobile-filters">
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="full-width">
         <mat-label>Search</mat-label>
         <input matInput (keyup)="applyTextFilter($event)" placeholder="Search transactions">
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="full-width">
         <mat-label>Start Date</mat-label>
         <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate">
         <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
         <mat-datepicker #startPicker></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="full-width">
         <mat-label>End Date</mat-label>
         <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate">
         <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
         <mat-datepicker #endPicker></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="full-width">
         <mat-label>Category Types</mat-label>
         <mat-select multiple [(ngModel)]="selectedTypes">
-            <mat-option *ngFor="let t of categoryTypes" [value]="t">
+          <mat-option *ngFor="let t of categoryTypes" [value]="t.id">
             {{ t.subtype }}
-            </mat-option>
+          </mat-option>
         </mat-select>
       </mat-form-field>
 
-    <button mat-raised-button color="primary" (click)="search()">
+      <button mat-raised-button color="primary" class="full-width" (click)="search()">
         Search
-    </button>
-    
+      </button>
+
     </div>
 
     <mat-card-content>
 
-      <div class="table-container">
+      <div class="table-container mobile-table">
         <table mat-table [dataSource]="dataSource" matSort class="styled-table">
 
           <!-- Date -->
@@ -92,7 +92,11 @@
         </table>
       </div>
 
-      <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50]" showFirstLastButtons></mat-paginator>
+      <mat-paginator
+        [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        showFirstLastButtons>
+      </mat-paginator>
 
     </mat-card-content>
 
