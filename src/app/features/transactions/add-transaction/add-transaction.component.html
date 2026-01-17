@@ -1,4 +1,4 @@
-<div class="page-container">
+<div class="page-container mobile-form">
   <h2 class="page-title">Add Transaction</h2>
 
   <mat-card class="transaction-card">
@@ -8,55 +8,55 @@
     </mat-card-header>
 
     <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid">
+      <form [formGroup]="form" (ngSubmit)="submit()">
 
-        <mat-form-field appearance="outline">
-          <mat-label>Date</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="date">
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-        
-        <mat-form-field appearance="outline">
-          <mat-label>Store</mat-label>
-          <input matInput formControlName="store">
-        </mat-form-field>
+        <div class="form-section">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Description</mat-label>
-          <input matInput formControlName="description">
-        </mat-form-field>
-        
-        <mat-form-field appearance="outline">
-          <mat-label>Category</mat-label>
-          <mat-select formControlName="category">
-            <mat-option *ngFor="let c of categories" [value]="c">
-              {{ c.subtype }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Store</mat-label>
+            <input matInput formControlName="store">
+          </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Amount</mat-label>
-          <input matInput type="number" formControlName="amount">
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="description">
+          </mat-form-field>
 
-        <!-- Subscription Checkbox -->
-        <mat-checkbox formControlName="isSubscription">
-          Is Subscription?
-        </mat-checkbox>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Category</mat-label>
+            <mat-select formControlName="category">
+              <mat-option *ngFor="let c of categories" [value]="c">
+                {{ c.subtype }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
 
-        <!-- Months textbox (visible only when checkbox is checked) -->
-        <mat-form-field appearance="outline" *ngIf="form.get('isSubscription')?.value">
-          <mat-label>Number of Months</mat-label>
-          <input matInput type="number" formControlName="months">
-        </mat-form-field>    
-
-        <div class="action-row">
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-            Save Transaction
-          </button>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Amount</mat-label>
+            <input matInput type="number" formControlName="amount">
+          </mat-form-field>
         </div>
+
+        <div class="subscription-section">
+          <mat-checkbox formControlName="isSubscription">
+            Is Subscription?
+          </mat-checkbox>
+
+          <mat-form-field appearance="outline" class="full-width" *ngIf="form.get('isSubscription')?.value">
+            <mat-label>Number of Months</mat-label>
+            <input matInput type="number" formControlName="months">
+          </mat-form-field>
+        </div>
+
+        <button mat-raised-button color="primary" class="submit-btn" type="submit" [disabled]="form.invalid">
+          Save Transaction
+        </button>
 
       </form>
     </mat-card-content>
