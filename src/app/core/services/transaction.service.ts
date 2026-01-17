@@ -23,7 +23,13 @@ export class TransactionService {
     return this.getTransactions(categoryTypes, startOfMonth, endOfMonth);
   }
 
-  async getTransactions(categoryTypes?: number[], startDate?: String, endDate?: String): Promise<Transaction[]> {
+  async getTransactions(
+    categoryTypes?: number[], 
+    startDate?: String, 
+    endDate?: String,
+    subTypes?: number[]
+  ): Promise<Transaction[]> {
+
     let query = supabase
       .from('Transactions')
       .select(`
@@ -42,7 +48,7 @@ export class TransactionService {
       .order('date', { ascending: false });
 
     if(categoryTypes && categoryTypes.length > 0) {
-      query = query.in('Categories.id', categoryTypes);
+      query = query.in('Categories.type', categoryTypes);
     }
 
     if(startDate) {
@@ -52,7 +58,11 @@ export class TransactionService {
     if(endDate) {
       query.lte('date', endDate);
     }
-    
+
+    if(subTypes && subTypes.length > 0) {
+      query = query.in('Categories.id', subTypes);
+    }
+
     console.log("In:" , query);
     const {data, error} = await query;
 

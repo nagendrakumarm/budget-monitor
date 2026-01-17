@@ -97,7 +97,7 @@ export class AllTransactionsComponent implements OnInit, AfterViewInit  {
     console.log("Selected:After, " , params.categoryTypes);
     //this.router.navigate(['/transactions'], { queryParams: params });
 
-    this.txService.getTransactions(params.categoryTypes, params.startDate, params.endDate).then(list => {
+    this.txService.getTransactions([], params.startDate, params.endDate, params.categoryTypes).then(list => {
         this.transactions = list;
         this.dataSource.data = this.transactions;
     });

@@ -32,14 +32,18 @@
 .styled-table th {
   background: #f5f5f5;
   font-weight: 600;
-  padding: 12px;
   border-bottom: 2px solid #ddd;
 }
 
 /* Cell Styling */
 .styled-table td {
-  padding: 12px;
   border-bottom: 1px solid #eee;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 4px 6px !important;
+  line-height: 1.2;
 }
 
 /* Alternating Row Colors */
