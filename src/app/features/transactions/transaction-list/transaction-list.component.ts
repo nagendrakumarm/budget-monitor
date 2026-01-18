@@ -51,7 +51,8 @@ export class TransactionListComponent implements AfterViewInit  {
   textFilter = '';
   startDate: Date | null = null;
   endDate: Date | null = null;      
-  selectedCategoryType: string = '';
+  selectedCategoryType: number[] = [];
+  categoryTypeFilter: number[] = [];
   categoryTypes: Category[] = []; // or dynamic  
 
   transactions: Transaction[] = [];
@@ -139,6 +140,16 @@ export class TransactionListComponent implements AfterViewInit  {
       if (this.startDate && itemDate < this.startDate) return false;
       if (this.endDate && itemDate > this.endDate) return false;
 
+      // 3. CategoryType filter
+      const matchesCategory =
+        !this.categoryTypeFilter ||
+        this.categoryTypeFilter.length === 0 ||
+        this.categoryTypeFilter.includes(item.Categories?.id ?? -1);
+
+      console.log('in filter:' , this.categoryTypeFilter, '::', matchesCategory);
+
+      if(!matchesCategory) return false;
+      
       return true;
     };    
   }
@@ -153,9 +164,11 @@ export class TransactionListComponent implements AfterViewInit  {
   }
 
   applyCategoryTypeFilter() {
-    this.load();
+    this.categoryTypeFilter = this.selectedCategoryType ?? null;
+    this.dataSource.filter = Math.random().toString();
+    console.log("Selected:", this.selectedCategoryType);
+    console.log("Filter value:", this.categoryTypeFilter);
   }  
-  
   getTotalAmount(): number {
     if (!this.dataSource || !this.dataSource.filteredData) return 0;
 

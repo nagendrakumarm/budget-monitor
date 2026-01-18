@@ -32,9 +32,9 @@
 
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Category Type</mat-label>
-        <mat-select [(value)]="selectedCategoryType" (selectionChange)="applyCategoryTypeFilter()">
+        <mat-select multiple [(ngModel)]="selectedCategoryType" (selectionChange)="applyCategoryTypeFilter()">
           <mat-option value="">All</mat-option>
-          <mat-option *ngFor="let type of categoryTypes" [value]="type">{{ type.subtype }}</mat-option>
+          <mat-option *ngFor="let type of categoryTypes" [value]="type.id">{{ type.subtype }}</mat-option>
         </mat-select>
       </mat-form-field>
 
@@ -84,7 +84,7 @@
               {{ getCurrentPageTotal() | currency }}
             </td>
           </ng-container>
-          
+
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
           <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>

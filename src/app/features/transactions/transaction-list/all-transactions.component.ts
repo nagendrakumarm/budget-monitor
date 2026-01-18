@@ -16,6 +16,9 @@ import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { CategoryService } from '../../../core/services/category.service';
 import { Category } from '../../../core/models/category.model';
+import { MatDialog } from '@angular/material/dialog';
+import { EditTransactionDialogComponent } from '../edit-transaction/edit-transaction-dialog.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'all-transactions',
@@ -35,13 +38,14 @@ import { Category } from '../../../core/models/category.model';
     MatNativeDateModule,
     MatSelectModule,
     MatOptionModule,
+    MatIconModule,
     FormsModule
   ],
   templateUrl: './all-transactions.component.html',
   styleUrls: ['./all-transactions.component.scss']
 })
 export class AllTransactionsComponent implements OnInit, AfterViewInit  {
-  displayedColumns = ['date', 'store', 'description', 'category', 'amount'];
+  displayedColumns = ['date', 'store', 'description', 'category', 'amount', 'actions'];
   dataSource = new MatTableDataSource<Transaction>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -60,6 +64,7 @@ export class AllTransactionsComponent implements OnInit, AfterViewInit  {
     private txService: TransactionService,
     private categoryService: CategoryService,
     private router: Router,
+    private dialog: MatDialog,
     private route: ActivatedRoute
   ) {}
 
@@ -70,7 +75,8 @@ export class AllTransactionsComponent implements OnInit, AfterViewInit  {
         .filter(x => !isNaN(x));
       
       this.selectedTypes = types; 
-      this.load(types);
+      
+      //this.search(types);
     });
 
     // Load categories from Supabase
@@ -101,14 +107,6 @@ export class AllTransactionsComponent implements OnInit, AfterViewInit  {
         this.transactions = list;
         this.dataSource.data = this.transactions;
     });
-  }
-
-  load(categoryTypes?: number[]): void {
-    /*const types = categoryTypes && categoryTypes.length != 0? categoryTypes : [1, 2, 3, 5];
-    this.txService.getTransactions(types).then(list => {
-        this.transactions = list;
-        this.dataSource.data = this.transactions;
-    });*/
   }
 
   addNew(): void {
@@ -177,7 +175,7 @@ export class AllTransactionsComponent implements OnInit, AfterViewInit  {
   }
 
   applyCategoryTypeFilter() {
-    this.load();
+    this.search();
   }  
   
   getTotalAmount(): number {
@@ -199,4 +197,30 @@ export class AllTransactionsComponent implements OnInit, AfterViewInit  {
 
     return renderedData.reduce((sum, item) => sum + (item.amount || 0), 0);
   }
+
+  editTransaction(row: Transaction) {
+    const dialogRef = this.dialog.open(EditTransactionDialogComponent, {
+      width: '400px',
+      data: row
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.search(); // refresh table
+      }
+    });
+  }
+
+  deleteTransaction(row: Transaction) {
+    if (!confirm(`Delete transaction: ${row.description}?`)) return;
+
+    if (!row.id) {
+      alert('Nothing selected to delete');
+      return;
+    }
+
+    this.txService.deleteTransaction(row.id).then(() => {
+      this.search(); // reload table
+    });
+  }  
 }

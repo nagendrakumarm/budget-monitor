@@ -54,3 +54,19 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   gap: 16px;
   margin: 16px 0;
 }
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+mat-dialog-content {
+  padding-top: 10px;
+}

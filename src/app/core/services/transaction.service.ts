@@ -132,7 +132,7 @@ export class TransactionService {
     }
   }
 
-  async deleteTransaction(id: string): Promise<void> {
+  async deleteTransaction(id: number): Promise<void> {
     const { error } = await supabase
       .from('Transactions')
       .delete()
@@ -141,6 +141,21 @@ export class TransactionService {
     if (error) throw error;
   }
 
+  async updateTransaction(tx: any) {
+    const { error } = await supabase
+      .from('Transactions')
+      .update({
+        date: tx.date,
+        store: tx.store,
+        description: tx.description,
+        amount: tx.amount,
+        category: tx.category_id
+      })
+      .eq('id', tx.id);
+
+    if (error) throw error;
+  }
+    
   async clearAll(): Promise<void> {
     const { error } = await supabase
       .from('Transactions')
