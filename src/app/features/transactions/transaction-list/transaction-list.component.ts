@@ -16,6 +16,9 @@ import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { CategoryService } from '../../../core/services/category.service';
 import { Category } from '../../../core/models/category.model';
+import { EditTransactionDialogComponent } from '../edit-transaction/edit-transaction-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-transaction-list',
@@ -35,13 +38,14 @@ import { Category } from '../../../core/models/category.model';
     MatNativeDateModule,
     MatSelectModule,
     MatOptionModule,
+    MatIconModule,
     FormsModule
   ],
   templateUrl: './transaction-list.component.html',
   styleUrls: ['./transaction-list.component.scss']
 })
 export class TransactionListComponent implements AfterViewInit  {
-  displayedColumns = ['date', 'store', 'description', 'category', 'amount'];
+  displayedColumns = ['date', 'store', 'description', 'category', 'amount', 'actions'];
   dataSource = new MatTableDataSource<Transaction>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -61,6 +65,7 @@ export class TransactionListComponent implements AfterViewInit  {
     private txService: TransactionService,
     private categoryService: CategoryService,
     private router: Router,
+    private dialog: MatDialog,
     private route: ActivatedRoute
   ) {}
 
@@ -149,7 +154,7 @@ export class TransactionListComponent implements AfterViewInit  {
       console.log('in filter:' , this.categoryTypeFilter, '::', matchesCategory);
 
       if(!matchesCategory) return false;
-      
+
       return true;
     };    
   }
@@ -188,4 +193,30 @@ export class TransactionListComponent implements AfterViewInit  {
 
     return renderedData.reduce((sum, item) => sum + (item.amount || 0), 0);
   }
+
+  editTransaction(row: Transaction) {
+    const dialogRef = this.dialog.open(EditTransactionDialogComponent, {
+      width: '400px',
+      data: row
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.load(); // refresh table
+      }
+    });
+  }
+
+  deleteTransaction(row: Transaction) {
+    if (!confirm(`Delete transaction: ${row.description}?`)) return;
+
+    if (!row.id) {
+      alert('Nothing selected to delete');
+      return;
+    }
+
+    this.txService.deleteTransaction(row.id).then(() => {
+      this.load(); // reload table
+    });
+  }    
 }

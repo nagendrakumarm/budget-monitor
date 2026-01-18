@@ -14,7 +14,6 @@ import { CurrencyPipe, DatePipe, NgIf } from '@angular/common';
 import { Category } from '../../../core/models/category.model';
 import { CategoryService } from '../../../core/services/category.service';
 import { NgFor } from '@angular/common';
-import { isSubscription } from 'rxjs/internal/Subscription';
 
 @Component({
   selector: 'app-add-transaction',
