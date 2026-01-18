@@ -15,16 +15,32 @@
     </div>
   </div>
 
-  <div>
-    <mat-label>Display Payments for: </mat-label>
-    <button mat-raised-button color="primary" (click)="goToPreviousMonthPayments()">
-        << Previous Month
-    </button>
-    <span>{{ currentMonth }}</span>
-    <button mat-raised-button color="primary" (click)="goToNextMonthPayments()">
-        >> Next Month
-    </button>
-  </div>      
+  <div class="month-nav-container">
+    <div class="month-nav">
+      <span class="label">Display Payments for:</span>
+      <button mat-raised-button color="primary" (click)="goToPreviousMonthPayments()">
+        <mat-icon>chevron_left</mat-icon>
+        Previous
+      </button>
+
+      <span class="current-month">{{ currentMonth }}</span>
+
+      <button mat-raised-button color="primary" (click)="goToNextMonthPayments()">
+        Next
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <mat-checkbox [(ngModel)]="hideZeroPayments" (change)="applyFilters()">
+      Remove $0 Payments
+    </mat-checkbox>
+
+    <mat-checkbox [(ngModel)]="showOnlyUnpaid" (change)="applyFilters()">
+      Show Only Unpaid
+    </mat-checkbox>
+  </div>  
 
   <div class="table-container">
     <table class="summary-table">
@@ -38,7 +54,11 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let row of payments">
+        <tr 
+          *ngFor="let row of filteredPayments"
+          [class.positive-bg]="row.is_paid"
+          [class.negative-bg]="!row.is_paid && row.amount > 0"
+        >
           <td>{{ row.Accounts?.name }}</td>
           <td>{{ row.month }}-{{ row.Accounts?.duedate }}</td>
           <td>{{ row.amount | currency:'USD':'symbol':'1.2-2' }}</td>

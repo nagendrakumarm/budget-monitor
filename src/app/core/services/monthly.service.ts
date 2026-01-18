@@ -22,40 +22,47 @@ export class MonthlyPaymentsService {
   }
 
   // READ ALL
-  async getPayments(month? : string) {
-    const { data, error } = await supabase
-      .from(this.table)
+  async getPayments(month: string): Promise<MonthlyPayment[]> {
+    // 1. Fetch all accounts
+    const { data: accounts, error: accError } = await supabase
+      .from('Accounts')
       .select(`
         id,
-        account_id,
-        account_id (
+        name,
+        duedate,
+        isactive,
+        type,
+        AccountTypes:type (
           id,
-          name,
-          duedate,
-          isactive,
-          type,
-          AccountTypes:type (
-            id,
-            type
-          )
-        ),
-        month,
-        amount,
-        is_paid  
+          type
+        )
       `)
+      .order('duedate');
+
+    if (accError) throw accError;
+
+    // 2. Fetch payments for the selected month
+    const { data: payments, error: payError } = await supabase
+      .from(this.table)
+      .select('*')
       .eq('month', month);
-      //.order('account_id.duedate', { ascending: true });
 
-    if (error) throw error;
+    if (payError) throw payError;
 
-    const normalized = data.map(t => ({
-        ...t,
-        Accounts: Array.isArray(t.account_id)
-            ? t.account_id[0]   // take the first element
-            : t.account_id
-    }));
+    // 3. Merge accounts + payments
+    const merged: MonthlyPayment[] = accounts.map(acc => {
+      const payment = payments.find(p => p.account_id === acc.id);
 
-    return normalized as MonthlyPayment[];
+      return {
+        id: payment?.id ?? null,
+        month,
+        amount: payment?.amount ?? 0,
+        is_paid: payment?.is_paid ?? false,
+        Accounts: acc
+      };
+    });
+
+    return merged;
   }
 
   // READ ONE

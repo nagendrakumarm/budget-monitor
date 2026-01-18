@@ -84,3 +84,21 @@ mat-card {
 .total-all {
   color: #1565c0; /* blue */
 }
+
+.month-nav-container {
+  margin: 20px 0;
+  gap: 10px;
+}
+
+.month-nav {
+  display: flex;
+  gap: 20px;
+}
+
+.current-month {
+  font-size: 20px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 6px;
+  background: #f1f1f1;
+}

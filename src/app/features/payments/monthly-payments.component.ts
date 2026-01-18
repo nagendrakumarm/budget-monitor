@@ -14,6 +14,8 @@ import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-monthly-payments',
@@ -32,6 +34,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatTableModule,
     MatSlideToggleModule,
     MatSnackBarModule,
+    MatCheckboxModule,
+    MatIconModule,
     NgFor
   ],
   templateUrl: './monthly-payments.component.html',
@@ -48,6 +52,9 @@ export class MonthlyPaymentsComponent implements OnInit {
   totalPayments = 0;
   totalPaid = 0;
   totalUnpaid = 0;
+  hideZeroPayments = true;
+  showOnlyUnpaid = false;
+  filteredPayments: MonthlyPayment[] = [];  
 
   constructor(
     private fb: FormBuilder,
@@ -111,6 +118,7 @@ export class MonthlyPaymentsComponent implements OnInit {
     this.service.getPayments(this.currentMonth)
       .then(data => {
         this.payments = data;
+        this.filteredPayments = [... this.payments];
 
         this.totalPayments = data.reduce((sum, p) => sum + p.amount, 0);
 
@@ -126,7 +134,9 @@ export class MonthlyPaymentsComponent implements OnInit {
           const dateA = Number(a.Accounts?.duedate);
           const dateB = Number(b.Accounts?.duedate);
           return dateA - dateB;
-        });    
+        });
+        
+        this.applyFilters();
       });
   }  
 
@@ -134,6 +144,8 @@ export class MonthlyPaymentsComponent implements OnInit {
     const [year, month] = this.currentMonth.split('-').map(Number);
     const date = new Date(year, month - 2); // subtract 1 month (JS months are 0-based)
     this.currentMonth = this.formatMonth(date);
+
+    this.form.get('month')?.setValue(this.currentMonth);
     this.loadPayments();
   }
 
@@ -141,8 +153,11 @@ export class MonthlyPaymentsComponent implements OnInit {
     const [year, month] = this.currentMonth.split('-').map(Number);
     const date = new Date(year, month); // add 1 month
     this.currentMonth = this.formatMonth(date);
+
+    this.form.get('month')?.setValue(this.currentMonth);
     this.loadPayments()
   }
+
   edit(payment: MonthlyPayment) {
     this.editing = { ...payment };
   }
@@ -160,7 +175,7 @@ export class MonthlyPaymentsComponent implements OnInit {
 
   async togglePaid(payment: any) {
     await this.service.togglePaid(payment);
-    this.loadPayments();
+    this.applyFilters();
   }  
 
   async delete(id: number) {
@@ -200,4 +215,19 @@ export class MonthlyPaymentsComponent implements OnInit {
     });    
   }
 
+  applyFilters() {
+    this.filteredPayments = this.payments.filter(p => {
+      let include = true;
+
+      if (this.hideZeroPayments) {
+        include = include && p.amount !== 0;
+      }
+
+      if (this.showOnlyUnpaid) {
+        include = include && !p.is_paid;
+      }
+
+      return include;
+    });
+  }  
 }

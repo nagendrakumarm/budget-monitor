@@ -70,3 +70,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 mat-dialog-content {
   padding-top: 10px;
 }
+
+/* Positive / negative row highlighting */
+.positive-bg {
+  background: #e8f5e9;
+}
+
+.negative-bg {
+  background: #ffebee;
+}
