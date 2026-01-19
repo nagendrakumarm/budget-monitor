@@ -1,0 +1,43 @@
+<div class="page-container mobile-transactions">
+  <h2 class="page-title">Add Gift Card</h2>
+
+  <mat-card class="transaction-card">
+    <mat-card-header>
+      <mat-card-title>New Gift Card</mat-card-title>
+      <mat-card-subtitle>Enter the details below</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <div class="filters mobile-filters">
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Card Number</mat-label>
+            <input matInput formControlName="card_number">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Card Pin</mat-label>
+            <input matInput formControlName="card_pin">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Amount</mat-label>
+            <input matInput type="number" formControlName="initial_amount">
+          </mat-form-field>
+        </div>
+
+        <button mat-raised-button color="primary" class="submit-btn" type="submit" [disabled]="form.invalid">
+          Save
+        </button>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

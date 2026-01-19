@@ -1,0 +1,40 @@
+<div class="page-container mobile-transactions">
+  <h2>Gift Cards</h2>
+
+  <mat-card class="transactions-card">
+
+    <mat-card-title class="header">
+        <button mat-raised-button color="primary" (click)="addNew()">Add Gift Card</button>
+    </mat-card-title>
+
+    <div class="table-container">
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Gift Card Name</th>
+                    <th>Gift Card Number</th>
+                    <th>Gift Card Pin</th>
+                    <th>Remaining Balance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let card of cards">
+                    <td>{{ card.name }}</td>
+                    <td>{{ card.card_number }}</td>
+                    <td>{{ card.card_pin }}</td>
+                    <td>{{ card.remaining_balance }}</td>
+                    <td class="actions-cell">
+                        <button mat-icon-button color="primary" (click)="addGiftCardUsage(card)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>    
+  
+  </mat-card>
+</div>
+

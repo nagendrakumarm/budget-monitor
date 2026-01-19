@@ -1,0 +1,27 @@
+<div class="page-container mobile-transactions">
+    <h2 class="page-title" mat-dialog-title>Add Gift Card Usage</h2>
+
+    <mat-dialog-content>
+        <form [formGroup]="form" class="dialog-form">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Amount Used</mat-label>
+                <input matInput formControlName="used_amount">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Location</mat-label>
+                <input matInput formControlName="location">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Notes</mat-label>
+                <input matInput formControlName="note">
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" class="submit-btn" type="submit" (click)="addGCUsage()" [disabled]="form.invalid">
+                Add GC Usage
+            </button>
+
+        </form>
+    </mat-dialog-content>
+</div>

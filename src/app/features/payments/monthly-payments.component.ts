@@ -101,7 +101,7 @@ export class MonthlyPaymentsComponent implements OnInit {
         this.form.reset({
           accountname: null,
           amount: null,
-          month: this.formatMonth(new Date()),
+          month: tx.month,
           is_paid: false
         });
       })
