@@ -108,7 +108,7 @@ mat-dialog-content {
 }
 
 .summary-table th {
-  background: #1976d2;
+  background: #1976d2 !important;
   color: white;
   padding: 12px;
   text-align: left;
@@ -127,3 +127,4 @@ mat-dialog-content {
 .summary-table tr:last-child td {
   border-bottom: none;
 }
+

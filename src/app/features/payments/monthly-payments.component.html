@@ -41,36 +41,53 @@
       Show Only Unpaid
     </mat-checkbox>
   </div>  
+  
+  <mat-card>
+    <div class="table-container mobile-table">
+      <table mat-table [dataSource]="dataSource" matSort class="summary-table">
 
-  <div class="table-container">
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th>Account</th>
-          <th>Due Date</th>
-          <th>Amount</th>
-          <th>Paid?</th>
-        </tr>
-      </thead>
+        <!-- Account Column -->
+        <ng-container matColumnDef="account">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Account</th>
+          <td mat-cell *matCellDef="let row">{{ row.Accounts?.name }}</td>
+        </ng-container>
 
-      <tbody>
-        <tr 
-          *ngFor="let row of filteredPayments"
-          [class.positive-bg]="row.is_paid"
-          [class.negative-bg]="!row.is_paid && row.amount > 0"
-        >
-          <td>{{ row.Accounts?.name }}</td>
-          <td>{{ row.month }}-{{ row.Accounts?.duedate }}</td>
-          <td>{{ row.amount | currency:'USD':'symbol':'1.2-2' }}</td>
-          <td>
+        <!-- Due Date Column -->
+        <ng-container matColumnDef="dueDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Due Date</th>
+          <td mat-cell *matCellDef="let row">{{ row.month }}-{{ row.Accounts?.duedate }}</td>
+        </ng-container>
+
+        <!-- Amount Column -->
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
+          <td mat-cell *matCellDef="let row">{{ row.amount | currency:'USD':'symbol':'1.2-2' }}</td>
+        </ng-container>
+
+        <!-- Previous Month Column -->
+        <ng-container matColumnDef="previous_amount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Previous Month</th>
+          <td mat-cell *matCellDef="let row">{{ row.previous_amount | currency:'USD':'symbol':'1.2-2' }}</td>
+        </ng-container>
+
+        <!-- Paid Column -->
+        <ng-container matColumnDef="is_paid">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Paid?</th>
+          <td mat-cell *matCellDef="let row">
             <mat-slide-toggle [checked]="row.is_paid" (change)="togglePaid(row)">
             </mat-slide-toggle>
           </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+        </ng-container>
 
+        <!-- Header and Row Declarations -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            [class.positive-bg]="row.is_paid"
+            [class.negative-bg]="!row.is_paid && row.amount > 0">
+        </tr>
+      </table>
+    </div>
+  </mat-card>
   <!-- Add New -->
   <mat-card>
     <mat-card-title>Add Payment</mat-card-title>

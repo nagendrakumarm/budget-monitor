@@ -41,22 +41,27 @@ export class MonthlyPaymentsService {
 
     if (accError) throw accError;
 
-    // 2. Fetch payments for the selected month
+    // 2. Compute previous month string
+    const prevMonth = getPreviousMonth(month);
+
+    // 3. Fetch payments for the current month + previous month
     const { data: payments, error: payError } = await supabase
       .from(this.table)
       .select('*')
-      .eq('month', month);
+      .in('month', [month, prevMonth]);
 
     if (payError) throw payError;
 
-    // 3. Merge accounts + payments
+    // 4. Merge accounts + payments
     const merged: MonthlyPayment[] = accounts.map(acc => {
-      const payment = payments.find(p => p.account_id === acc.id);
+      const payment = payments.find(p => p.account_id === acc.id && p.month === month);
+      const prevPay = payments.find(p => p.account_id === acc.id && p.month === prevMonth);
 
       return {
         id: payment?.id ?? null,
         month,
         amount: payment?.amount ?? 0,
+        previous_amount: prevPay?.amount?? 0,
         is_paid: payment?.is_paid ?? false,
         Accounts: acc
       };
@@ -150,4 +155,21 @@ export class MonthlyPaymentsService {
       console.log('Toggle success: ', data[0]);
     }
   }  
+}
+
+function getPreviousMonth(month: string): string {
+  // month is expected in "YYYY-MM" format
+  const [yearStr, monthStr] = month.split("-");
+  const year = parseInt(yearStr, 10);
+  const m = parseInt(monthStr, 10);
+
+  // If January, roll back to December of previous year
+  if (m === 1) {
+    return `${year - 1}-12`;
+  }
+
+  // Otherwise just subtract one month, pad with leading zero
+  const prev = m - 1;
+  const prevMonth = prev.toString().padStart(2, "0");
+  return `${year}-${prevMonth}`;
 }

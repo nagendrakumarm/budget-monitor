@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MonthlyPaymentsService } from '../../core/services/monthly.service';
@@ -16,6 +16,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 
 @Component({
   selector: 'app-monthly-payments',
@@ -32,6 +33,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatDatepickerModule,
     MatNativeDateModule,
     MatTableModule,
+    MatSortModule,
     MatSlideToggleModule,
     MatSnackBarModule,
     MatCheckboxModule,
@@ -47,8 +49,11 @@ export class MonthlyPaymentsComponent implements OnInit {
   form!: FormGroup;
   editing: MonthlyPayment | null = null;
   currentMonth!: string;
-  displayedColumns = ['account', 'amount', 'is_paid'];
+  displayedColumns = ['account', 'dueDate', 'amount', 'previous_amount', 'is_paid'];
   dataSource = new MatTableDataSource<MonthlyPayment>();
+ 
+  @ViewChild(MatSort) sort!: MatSort;
+
   totalPayments = 0;
   totalPaid = 0;
   totalUnpaid = 0;
@@ -74,6 +79,10 @@ export class MonthlyPaymentsComponent implements OnInit {
     });
     this.loadPayments();
     this.accounts = await this.service.getAccounts();
+  }
+
+  async ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
   }
 
   async submit() {
@@ -119,6 +128,7 @@ export class MonthlyPaymentsComponent implements OnInit {
       .then(data => {
         this.payments = data;
         this.filteredPayments = [... this.payments];
+        this.dataSource.data = this.filteredPayments;
 
         this.totalPayments = data.reduce((sum, p) => sum + p.amount, 0);
 
@@ -229,5 +239,7 @@ export class MonthlyPaymentsComponent implements OnInit {
 
       return include;
     });
+
+    this.dataSource.data = this.filteredPayments;
   }  
 }

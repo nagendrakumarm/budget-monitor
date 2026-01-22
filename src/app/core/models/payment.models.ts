@@ -2,6 +2,7 @@ export interface MonthlyPayment {
   id?: number;
   month: string;
   amount: number;
+  previous_amount?: number;
   Accounts?: PaymentAccount;
   is_paid: boolean;
 }
