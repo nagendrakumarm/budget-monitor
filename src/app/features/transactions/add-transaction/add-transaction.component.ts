@@ -84,7 +84,7 @@ export class AddTransactionComponent implements OnInit {
     console.log('Form Sub:', value.isSubscription)
 
     const tx = {
-      date: (value.date as Date).toISOString().split('T')[0],
+      date: this.formatDateOnly(value.date),
       store: value.store!,
       description: value.description || '',
       category: value.category.id!,
@@ -105,4 +105,11 @@ export class AddTransactionComponent implements OnInit {
       alert('Insert failed:'+ err);
     }
   }
+
+  formatDateOnly(d: Date): string {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }  
 }
