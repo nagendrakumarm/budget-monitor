@@ -128,3 +128,10 @@ mat-dialog-content {
   border-bottom: none;
 }
 
+.mobile-table {
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  width: 100%;
+  display: block !important;
+  position: relative;
+}
