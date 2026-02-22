@@ -235,4 +235,82 @@ export class TransactionService {
 
     return Array.from(map.values());
   }  
+
+  async getCategoryTotals() {
+    const { data, error } = await supabase
+      .from('Transactions')
+      .select(`
+        amount,
+        category,
+        date,
+        Categories (
+        id,
+        subtype,
+        type
+      )
+    `).neq('category', 26);
+
+    if (error) throw error;
+
+    // Normalize because Supabase returns Categories as an array
+    const normalized = data.map(t => ({
+      ...t,
+      categoryObj: Array.isArray(t.Categories) ? t.Categories[0] : t.Categories
+    }));
+
+    // Group by category name
+    const totals: Record<string, number> = {};
+
+    normalized.forEach(t => {
+      const catName = t.categoryObj?.subtype ?? 'Uncategorized';
+
+      if (!totals[catName]) totals[catName] = 0;
+      totals[catName] += t.amount;
+    });
+
+    return totals;
+  }
+
+async getCategoryTotalsByMonth(month: number, year: number) {
+
+  console.log('Month:', month, ': Year: ', year);
+  const start = new Date(year, month - 1, 1).toISOString().split('T')[0];
+  const end = new Date(year, month, 0).toISOString().split('T')[0];
+  console.log('Start:', start, ': End: ', end);
+
+  const { data, error } = await supabase
+    .from('Transactions')
+    .select(`
+      amount,
+        date,
+        Categories (
+        id,
+        subtype,
+        type
+      )
+    `)
+    .neq('category', 26)
+    .gte('date', start)
+    .lte('date', end);
+
+    if (error) throw error;
+
+    // Normalize because Supabase returns Categories as an array
+    const normalized = data.map(t => ({
+      ...t,
+      categoryObj: Array.isArray(t.Categories) ? t.Categories[0] : t.Categories
+    }));
+
+    // Group by category name
+    const totals: Record<string, number> = {};
+
+    normalized.forEach(t => {
+      const catName = t.categoryObj?.subtype ?? 'Uncategorized';
+
+      if (!totals[catName]) totals[catName] = 0;
+      totals[catName] += t.amount;
+    });
+
+    return totals;
+  }
 }

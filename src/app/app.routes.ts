@@ -10,6 +10,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { AllTransactionsComponent } from './features/transactions/transaction-list/all-transactions.component';
 import { GiftCardListComponent } from './features/gift-card/gift-card-list/gift-card-list.component';
 import { AddGiftCardComponent } from './features/gift-card/add-gift-card/add-gift-card.component';
+import { CategorySummaryComponent } from './features/transactions/category-summary/category-summary.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -28,5 +29,6 @@ export const routes: Routes = [
   { path: 'alltransactions', component: AllTransactionsComponent },
   { path: 'giftcards', component: GiftCardListComponent },
   { path: 'addgiftcard', component: AddGiftCardComponent },
+  { path: 'categorySummary', component: CategorySummaryComponent },
   { path: '**', redirectTo: 'dashboard' }
 ];
