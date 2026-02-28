@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { supabase } from '../supabase.client';
-import { Category } from '../models/category.model';
+import { Categories } from '../models/category.model';
 
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
 
-  async getCategories(): Promise<Category[]> {
+  async getCategories(): Promise<Categories[]> {
     const { data, error } = await supabase
       .from('Categories')
       .select('id, type, subtype')
@@ -13,7 +13,7 @@ export class CategoryService {
 
     if (error) throw error;
     console.debug('Got Categories:', data.length);
-    return data as Category[];
+    return data as Categories[];
   }
 
   async getCategoryIdBySubtype(subtype: string): Promise<number | null> {

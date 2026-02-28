@@ -12,8 +12,11 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let row of categoryTotals">
-          <td>{{ row.category }}</td>
+        <tr *ngFor="let row of categoryTotals"
+          [class.type-row]="row.isType"
+          [class.cat-row]="row.isCat"
+        >
+          <td>{{ row.name }}</td>
           <td *ngFor="let m of months">
             {{ row.months[m] || 0 | number:'1.0-0' }}
           </td>

@@ -118,18 +118,29 @@ export class CategorySummaryComponent implements OnInit {
   async loadSummary() {
     const tx = await this.txService.getTransactions();
 
-    // Normalize category name
-    const normalized = tx.map(t => ({
-      amount: t.amount,
-      date: new Date(t.date),
-      category: Array.isArray(t.Categories)
-        ? t.Categories[0]?.subtype
-        : t.Categories?.subtype
-    }));
+    console.log(JSON.stringify(tx[0], null, 2));
 
+    // Normalize category name
+    const normalized = tx.map(t => {
+      const cat = Array.isArray(t.Categories)
+        ? t.Categories[0]
+        : t.Categories;
+
+      const ct = Array.isArray(cat.CategoryType)
+        ? cat.CategoryType[0]
+        : cat.CategoryType;
+
+      console.log(ct + ":::" + cat?.subtype + ":::" + ct?.type);
+      return {
+        amount: t.amount,
+        date: new Date(t.date),
+        type: ct?.type ?? null,       // <-- NOW WORKS
+        category: cat?.subtype ?? null
+      };
+    });
     // Structure:
     // { Food: [Jan, Feb, Mar, ...], Utilities: [...], ... }
-    const summary: Record<string, Record<string, number>> = {};
+    const summary: Record<string, Record<string, Record<string, number>>> = {};
     const monthsWithData = new Set<string>();
 
     normalized.forEach(t => {
@@ -145,13 +156,23 @@ export class CategorySummaryComponent implements OnInit {
      
       monthsWithData.add(label);
       const cat = t.category ?? 'Uncategorized';
+      const type = t.type ?? 'Uncategorized';
 
-      if (!summary[cat]) {
-        summary[cat] = {};
+      if (!summary[type]) {
+        summary[type] = {};
       }
 
-      summary[cat][label] = (summary[cat][label] || 0) + t.amount;
+      if (!summary[type][cat]) {
+        summary[type][cat] = {};
+      }
+
+      summary[type][cat][label] = (summary[type][cat][label] || 0) + t.amount;
+      //monthlyTotals[label] = (monthlyTotal[label] || 0 ) + t.amount;
     });
+
+    /*const normalized2 = normalize(tx);*/
+
+    //const monthlyTotals = this.calculateMonthlyTotals(summary);
 
     // Convert Set → sorted array
     this.months = Array.from(monthsWithData).sort((a, b) => {
@@ -173,19 +194,47 @@ export class CategorySummaryComponent implements OnInit {
       this.monthlyTotals[m] = 0;
     });
 
-    Object.values(summary).forEach(monthMap => {
+    this.categoryTotals = [];
+
+    Object.entries(summary).forEach(([type, cat]) => {
+      // Compute total for the whole type
+      const typeTotal = Object.values(cat)
+        .flatMap(m => Object.values(m))
+        .reduce((a, b) => a + b, 0);
+
+      this.categoryTotals.push({
+        isType: true,
+        name: `Category ${type}`,
+        months: this.buildMonthMapForType(cat),
+        total: typeTotal
+      });
+
+      console.log(this.categoryTotals);
+      // Add each subtype row
+      Object.entries(cat).forEach(([subtype, months]) => {
+        const subtypeTotal = Object.values(months).reduce((a, b) => a + b, 0);
+
+        this.categoryTotals.push({
+          isType: false,
+          name: subtype,
+          months,
+          total: subtypeTotal
+        });
+      });
+    });    
+ 
+    Object.values(this.categoryTotals).forEach(monthMap => {
       this.months.forEach(m => {
-        this.monthlyTotals[m] += monthMap[m] || 0;
+        if(monthMap.isType) {
+          for (const month of Object.keys(monthMap.months)) { 
+            if (m == month) {
+              this.monthlyTotals[m] = (this.monthlyTotals[m] || 0) + monthMap.months[m];
+            } 
+          }
+        }
       });
     });
-    
-    // Convert to array for table
-    this.categoryTotals = Object.entries(summary).map(([category, months]) => ({
-      category,
-      months,
-      total: Object.values(months).reduce((a, b) => a + b, 0)
-    }));
-  }  
+}
 
   getMonthlyGrandTotal(): number {
     return this.months.reduce(
@@ -193,4 +242,17 @@ export class CategorySummaryComponent implements OnInit {
       0
     );
   }
+
+  buildMonthMapForType(subtypes: Record<string, Record<string, number>>) {
+    const map: Record<string, number> = {};
+    this.months.forEach(m => (map[m] = 0));
+
+    Object.values(subtypes).forEach(monthMap => {
+      this.months.forEach(m => {
+        map[m] += monthMap[m] || 0;
+      });
+    });
+
+    return map;
+  }  
 }

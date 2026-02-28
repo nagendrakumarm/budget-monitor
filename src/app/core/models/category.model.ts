@@ -1,5 +1,12 @@
-export interface Category {
-  id: string;
+export interface CategoryType {
+  id: number;
   type: string;
-  subtype: string;
 }
+
+export interface Categories {
+  id: number;
+  type: number;
+  subtype: string;
+  CategoryType: CategoryType | null;   // normalized to a single object
+}
+

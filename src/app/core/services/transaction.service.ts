@@ -42,7 +42,11 @@ export class TransactionService {
         Categories!inner (
             id,
             type,
-            subtype
+            subtype,
+            Categories_Type_fkey (
+              id,
+              type
+            )
         )
       `)
       .order('date', { ascending: false });
@@ -68,14 +72,39 @@ export class TransactionService {
 
     if (error) throw error;
 
-    const normalized = data.map(t => ({
-        ...t,
-        Categories: Array.isArray(t.Categories)
-            ? t.Categories[0]   // take the first element
-            : t.Categories
-    }));
+    const normalized: Transaction[] = data.map((t: any) => {
+      const cat = t.Categories;
+      const ctArray = cat.Categories_Type_fkey;
 
-    return normalized as Transaction[];
+      const normalizedCategoryType =
+        ctArray && ctArray.length > 0
+          ? {
+              id: Number(ctArray[0].id),
+              type: String(ctArray[0].type)
+            }
+          : {
+            id: Number(ctArray.id),
+            type: String(ctArray.type)
+          };
+
+      return {
+        id: Number(t.id),
+        amount: Number(t.amount),
+        date: t.date,
+        description: t.description,
+        store: t.store,
+        category: Number(t.category),
+
+        Categories: {
+          id: Number(cat.id),
+          type: Number(cat.type),
+          subtype: String(cat.subtype),
+          CategoryType: normalizedCategoryType
+        }
+      };
+    });
+
+    return normalized;
   }
 
   async addTransaction(tx: any): Promise<void> {

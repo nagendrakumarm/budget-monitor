@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { CategoryService } from '../../../core/services/category.service';
-import { Category } from '../../../core/models/category.model';
+import { Categories } from '../../../core/models/category.model';
 import { MatDialog } from '@angular/material/dialog';
 import { EditTransactionDialogComponent } from '../edit-transaction/edit-transaction-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
@@ -56,7 +56,7 @@ export class AllTransactionsComponent implements OnInit, AfterViewInit  {
   startDate: Date | null = null;
   endDate: Date | null = null;      
   selectedTypes: number[] = [];
-  categoryTypes: Category[] = [];
+  categoryTypes: Categories[] = [];
 
   transactions: Transaction[] = [];
 
