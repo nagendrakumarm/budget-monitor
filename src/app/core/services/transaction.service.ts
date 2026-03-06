@@ -141,7 +141,7 @@ export class TransactionService {
 
       for (let i = 0; i < months; i++) {
         const newDate = new Date(tx.date);
-        newDate.setMonth(newDate.getMonth() + i);
+        newDate.setMonth(newDate.getMonth() + 1);
 
         transactions.push({
           ...baseTx,
