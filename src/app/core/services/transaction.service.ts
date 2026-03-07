@@ -138,17 +138,16 @@ export class TransactionService {
 
       // Subscription → generate multiple monthly transactions
       const transactions = [];
-
+      const [y, m, d] = tx.date.split('-').map(Number);
+      const newDate = new Date(y, m - 1, d); // local time
       for (let i = 0; i < months; i++) {
-        const newDate = new Date(tx.date);
-        newDate.setMonth(newDate.getMonth() + 1);
-
         transactions.push({
           ...baseTx,
-          date: newDate.toISOString().split('T')[0], // YYYY-MM-DD
+          date: newDate.toLocaleDateString('en-CA').split('T')[0], // YYYY-MM-DD
         });
-      }
-
+        newDate.setMonth(newDate.getMonth() + 1);
+     }
+      console.log(transactions);
       const { error } = await supabase
         .from('Transactions')
         .insert(transactions);
