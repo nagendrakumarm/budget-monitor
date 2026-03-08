@@ -18,6 +18,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 
+interface PivotRow {
+  account: string;
+  [key: string]: string | number; // months like "2026-03" map to numbers
+}
+
 @Component({
   selector: 'app-monthly-payments',
   standalone: true,
@@ -49,9 +54,12 @@ export class MonthlyPaymentsComponent implements OnInit {
   form!: FormGroup;
   editing: MonthlyPayment | null = null;
   currentMonth!: string;
-  displayedColumns = ['account', 'dueDate', 'amount', 'previous_amount', 'is_paid'];
-  dataSource = new MatTableDataSource<MonthlyPayment>();
  
+  displayedColumns: string[] = [];
+  totalsRow: any = {};
+  pivotPayments: PivotRow[] = [];
+  dataSource!: MatTableDataSource<PivotRow>;
+
   @ViewChild(MatSort) sort!: MatSort;
 
   totalPayments = 0;
@@ -60,7 +68,8 @@ export class MonthlyPaymentsComponent implements OnInit {
   hideZeroPayments = true;
   showOnlyUnpaid = false;
   filteredPayments: MonthlyPayment[] = [];  
-
+  paymentsData: MonthlyPayment[] = [];
+  
   constructor(
     private fb: FormBuilder,
     private service: MonthlyPaymentsService,
@@ -126,29 +135,53 @@ export class MonthlyPaymentsComponent implements OnInit {
   loadPayments() {
     this.service.getPayments(this.currentMonth)
       .then(data => {
-        this.payments = data;
-        this.filteredPayments = [... this.payments];
-        this.dataSource.data = this.filteredPayments;
+        const all = [...data.current, ...data.previous];
 
-        this.totalPayments = data.reduce((sum, p) => sum + p.amount, 0);
+        this.pivotPayments = this.buildPivot(all);
+        this.dataSource = new MatTableDataSource<PivotRow>(this.pivotPayments);
+        this.totalsRow = this.buildTotalsRow(this.pivotPayments, this.displayedColumns);
 
-        this.totalPaid = data
-          .filter(p => p.is_paid) 
-          .reduce((sum, p) => sum + p.amount, 0);
-
-        this.totalUnpaid = data
-          .filter(p => !p.is_paid)
-          .reduce((sum, p) => sum + p.amount, 0);
-          
-        this.payments.sort((a, b) => {
-          const dateA = Number(a.Accounts?.duedate);
-          const dateB = Number(b.Accounts?.duedate);
-          return dateA - dateB;
-        });
-        
         this.applyFilters();
-      });
+
+});
   }  
+
+  buildPivot(payments: MonthlyPayment[]): PivotRow[] {
+    const pivot: Record<string, PivotRow> = {};
+    const months = new Set<string>();
+
+    for (const p of payments) {
+      const accName = p.Accounts?.name ?? 'Unknown';
+
+      if (!pivot[accName]) {
+        pivot[accName] = { account: accName };
+      }
+
+      pivot[accName][p.month] = p.amount;
+      months.add(p.month);
+    }
+
+    const sortedMonths = Array.from(months).sort((a, b) => b.localeCompare(a));
+    this.displayedColumns = ['account', ...sortedMonths];
+
+    return Object.values(pivot);
+  }
+
+buildTotalsRow(pivot: PivotRow[], displayedColumns: string[]) {
+  const totals: any = { account: 'TOTAL' };
+
+  for (const col of displayedColumns) {
+    if (col === 'account') continue;
+
+    totals[col] = pivot.reduce((sum, row) => {
+      const val = row[col];
+      return sum + (typeof val === 'number' ? val : 0);
+    }, 0);
+  }
+
+  return totals;
+}
+
 
   goToPreviousMonthPayments() {
     const [year, month] = this.currentMonth.split('-').map(Number);
@@ -225,21 +258,40 @@ export class MonthlyPaymentsComponent implements OnInit {
     });    
   }
 
-  applyFilters() {
-    this.filteredPayments = this.payments.filter(p => {
-      let include = true;
+applyFilters() {
+  let filtered = [...this.pivotPayments];
 
-      if (this.hideZeroPayments) {
-        include = include && p.amount !== 0;
-      }
+  if (this.hideZeroPayments) {
+    filtered = filtered.filter(row =>
+      Object.keys(row).some(k => k !== 'account' && row[k] !== 0)
+    );
+  }
 
-      if (this.showOnlyUnpaid) {
-        include = include && !p.is_paid;
-      }
+  if (this.showOnlyUnpaid) {
+    filtered = filtered.filter(row =>
+      Object.keys(row).some(k => k !== 'account' && row[k] === 0)
+    );
+  }
 
-      return include;
-    });
+  this.dataSource.data = filtered;
+}
 
-    this.dataSource.data = this.filteredPayments;
-  }  
+
+  groupByMonth(payments: MonthlyPayment[]) {
+    return payments.reduce((acc, p) => {
+      if (!acc[p.month]) acc[p.month] = [];
+      acc[p.month].push(p);
+      return acc;
+    }, {} as Record<string, MonthlyPayment[]>);
+  }
+
+  sortMonths = (a: any, b: any) => {
+    return a.key < b.key ? 1 : -1;
+  };
+
+  getCellValue(row: any, col: string): number | null {
+    const value = row[col];
+    return typeof value === 'number' ? value : null;
+  }
+
 }

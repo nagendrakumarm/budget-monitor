@@ -22,7 +22,10 @@ export class MonthlyPaymentsService {
   }
 
   // READ ALL
-  async getPayments(month: string): Promise<MonthlyPayment[]> {
+  async getPayments(month: string): Promise<{
+    current: MonthlyPayment[],
+    previous: MonthlyPayment[]
+  }> {
     // 1. Fetch all accounts
     const { data: accounts, error: accError } = await supabase
       .from('Accounts')
@@ -41,33 +44,52 @@ export class MonthlyPaymentsService {
 
     if (accError) throw accError;
 
-    // 2. Compute previous month string
-    const prevMonth = getPreviousMonth(month);
-
-    // 3. Fetch payments for the current month + previous month
-    const { data: payments, error: payError } = await supabase
+    // 2. Fetch ALL previous months payments
+    const { data: previousPayments, error: prevError } = await supabase
       .from(this.table)
       .select('*')
-      .in('month', [month, prevMonth]);
+      .lt('month', month); // <--- ALL months before the given month
 
-    if (payError) throw payError;
+    if (prevError) throw prevError;
 
-    // 4. Merge accounts + payments
-    const merged: MonthlyPayment[] = accounts.map(acc => {
-      const payment = payments.find(p => p.account_id === acc.id && p.month === month);
-      const prevPay = payments.find(p => p.account_id === acc.id && p.month === prevMonth);
+    // 3. Fetch current month payments
+    const { data: currentPayments, error: currError } = await supabase
+      .from(this.table)
+      .select('*')
+      .eq('month', month);
+
+    if (currError) throw currError;
+
+    // 4. Build current month payments (one per account)
+    const current: MonthlyPayment[] = accounts.map(acc => {
+      const payment = currentPayments.find(p => p.account_id === acc.id);
 
       return {
         id: payment?.id ?? null,
         month,
         amount: payment?.amount ?? 0,
-        previous_amount: prevPay?.amount?? 0,
-        is_paid: payment?.is_paid ?? false,
-        Accounts: acc
+        Accounts: acc,
+        is_paid: payment?.is_paid ?? false
       };
     });
 
-    return merged;
+    // 5. Build ALL previous months payments (each month separate)
+    const previous = previousPayments.map(p => {
+      const acc = accounts.find(a => a.id === p.account_id);
+
+      return {
+        id: p.id,
+        month: p.month,
+        amount: p.amount,
+        Accounts: acc,
+        is_paid: p.is_paid
+      };
+    });
+
+    return {
+      current,
+      previous
+    };
   }
 
   // READ ONE

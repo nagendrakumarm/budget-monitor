@@ -44,50 +44,56 @@
   
   <mat-card>
     <div class="table-container mobile-table">
-      <table mat-table [dataSource]="dataSource" matSort class="summary-table">
 
-        <!-- Account Column -->
-        <ng-container matColumnDef="account">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Account</th>
-          <td mat-cell *matCellDef="let row">{{ row.Accounts?.name }}</td>
-        </ng-container>
+<table mat-table [dataSource]="dataSource" class="summary-table">
+<!-- Account Column -->
+<ng-container matColumnDef="account">
+  <th mat-header-cell *matHeaderCellDef>Account</th>
+  <td mat-cell *matCellDef="let row">{{ row.account }}</td>
 
-        <!-- Due Date Column -->
-        <ng-container matColumnDef="dueDate">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Due Date</th>
-          <td mat-cell *matCellDef="let row">{{ row.month }}-{{ row.Accounts?.duedate }}</td>
-        </ng-container>
+  <!-- Footer -->
+  <td mat-footer-cell *matFooterCellDef class="total-label">
+    TOTAL
+  </td>
+</ng-container>
 
-        <!-- Amount Column -->
-        <ng-container matColumnDef="amount">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
-          <td mat-cell *matCellDef="let row">{{ row.amount | currency:'USD':'symbol':'1.2-2' }}</td>
-        </ng-container>
 
-        <!-- Previous Month Column -->
-        <ng-container matColumnDef="previous_amount">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Previous Month</th>
-          <td mat-cell *matCellDef="let row">{{ row.previous_amount | currency:'USD':'symbol':'1.2-2' }}</td>
-        </ng-container>
+<!-- Dynamic Month Columns -->
+<ng-container *ngFor="let col of displayedColumns">
+  
+  <ng-container *ngIf="col !== 'account'" [matColumnDef]="col">
 
-        <!-- Paid Column -->
-        <ng-container matColumnDef="is_paid">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Paid?</th>
-          <td mat-cell *matCellDef="let row">
-            <mat-slide-toggle [checked]="row.is_paid" (change)="togglePaid(row)">
-            </mat-slide-toggle>
-          </td>
-        </ng-container>
+    <th mat-header-cell *matHeaderCellDef>
+      {{ col }}
+    </th>
 
-        <!-- Header and Row Declarations -->
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-            [class.positive-bg]="row.is_paid"
-            [class.negative-bg]="!row.is_paid && row.amount > 0">
-        </tr>
-      </table>
+    <td mat-cell *matCellDef="let row">
+      {{ getCellValue(row, col) !== null 
+          ? (getCellValue(row, col) | currency) 
+          : '-' }}
+    </td>
+
+    <!-- Footer cell -->
+    <td mat-footer-cell *matFooterCellDef>
+      <strong>{{ totalsRow[col] | currency }}</strong>
+    </td>
+  </ng-container>
+
+</ng-container>
+
+<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+<tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+
+</table>
+
+
+
+
     </div>
   </mat-card>
+
+
   <!-- Add New -->
   <mat-card>
     <mat-card-title>Add Payment</mat-card-title>
