@@ -62,5 +62,22 @@ mat-card {
   font-weight: bold;
   padding: 4px 12px;
   border-radius: 6px;
-  background: #f1f1f1;
+  background: #ffeb3b;
+}
+
+/* Highlight current month header */
+.current-month-header {
+  background-color: #ffeb3b; /* Yellow */
+  font-weight: bold;
+}
+
+/* Highlight current month unpaid */
+.current-month-unpaid {
+  background-color: #fff59d; /* Light yellow */
+}
+
+/* Highlight current month paid */
+.current-month-paid {
+  background-color: #a5d6a7; /* Light green */
+  font-weight: bold;
 }

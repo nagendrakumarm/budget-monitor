@@ -47,8 +47,8 @@ export class MonthlyPaymentsService {
     // 2. Fetch ALL previous months payments
     const { data: previousPayments, error: prevError } = await supabase
       .from(this.table)
-      .select('*')
-      .lt('month', month); // <--- ALL months before the given month
+      .select('*');
+      //.lt('month', month); // <--- ALL months before the given month
 
     if (prevError) throw prevError;
 

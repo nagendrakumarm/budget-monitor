@@ -17,10 +17,13 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { filter } from 'rxjs';
 
 interface PivotRow {
   account: string;
-  [key: string]: string | number; // months like "2026-03" map to numbers
+  isPaid?: boolean;
+  paymentRecord?: MonthlyPayment;
+  [key: string]: string | number | boolean | MonthlyPayment | undefined; // months like "2026-03" map to numbers
 }
 
 @Component({
@@ -137,14 +140,40 @@ export class MonthlyPaymentsComponent implements OnInit {
       .then(data => {
         const all = [...data.current, ...data.previous];
 
+        //this.buildThisMonthTotals(data.current);
         this.pivotPayments = this.buildPivot(all);
         this.dataSource = new MatTableDataSource<PivotRow>(this.pivotPayments);
+        this.buildThisMonthTotals();
         this.totalsRow = this.buildTotalsRow(this.pivotPayments, this.displayedColumns);
-
         this.applyFilters();
 
-});
+    });
   }  
+
+  buildThisMonthTotals() {
+    const data = this.dataSource.data;
+    console.log("ROW:", data);
+    
+    this.totalPayments = data.reduce(
+        (sum, p) => sum + Number(this.getCellValue(p, this.currentMonth) || 0),
+        0
+      );
+    console.log("total: ", this.totalPayments);
+
+    this.totalPaid = data
+      .filter(p => p.isPaid)
+      .reduce(
+        (sum, p) => sum + Number(this.getCellValue(p, this.currentMonth) || 0),
+        0
+      );
+
+    this.totalUnpaid = data
+      .filter(p => !p.isPaid)
+      .reduce(
+        (sum, p) => sum + Number(this.getCellValue(p, this.currentMonth) || 0),
+        0
+      );
+  }
 
   buildPivot(payments: MonthlyPayment[]): PivotRow[] {
     const pivot: Record<string, PivotRow> = {};
@@ -159,6 +188,15 @@ export class MonthlyPaymentsComponent implements OnInit {
 
       pivot[accName][p.month] = p.amount;
       months.add(p.month);
+
+      // Add isPaid for the CURRENT month only
+      if (p.month === this.currentMonth) {
+        console.log("RosData: ", p.Accounts?.duedate);
+        pivot[accName]['isPaid'] = p.is_paid || p.amount == 0;
+        pivot[accName]['dueDate'] = p.Accounts?.duedate;
+        pivot[accName]['paymentRecord'] = p;
+      }
+            
     }
 
     const sortedMonths = Array.from(months).sort((a, b) => b.localeCompare(a));
@@ -167,38 +205,19 @@ export class MonthlyPaymentsComponent implements OnInit {
     return Object.values(pivot);
   }
 
-buildTotalsRow(pivot: PivotRow[], displayedColumns: string[]) {
-  const totals: any = { account: 'TOTAL' };
+  buildTotalsRow(pivot: PivotRow[], displayedColumns: string[]) {
+    const totals: any = { account: 'TOTAL' };
 
-  for (const col of displayedColumns) {
-    if (col === 'account') continue;
+    for (const col of displayedColumns) {
+      if (col === 'account' || col === 'isPaid') continue;
 
-    totals[col] = pivot.reduce((sum, row) => {
-      const val = row[col];
-      return sum + (typeof val === 'number' ? val : 0);
-    }, 0);
-  }
+      totals[col] = pivot.reduce((sum, row) => {
+        const val = row[col];
+        return sum + (typeof val === 'number' ? val : 0);
+      }, 0);
+    }
 
-  return totals;
-}
-
-
-  goToPreviousMonthPayments() {
-    const [year, month] = this.currentMonth.split('-').map(Number);
-    const date = new Date(year, month - 2); // subtract 1 month (JS months are 0-based)
-    this.currentMonth = this.formatMonth(date);
-
-    this.form.get('month')?.setValue(this.currentMonth);
-    this.loadPayments();
-  }
-
-  goToNextMonthPayments() {
-    const [year, month] = this.currentMonth.split('-').map(Number);
-    const date = new Date(year, month); // add 1 month
-    this.currentMonth = this.formatMonth(date);
-
-    this.form.get('month')?.setValue(this.currentMonth);
-    this.loadPayments()
+    return totals;
   }
 
   edit(payment: MonthlyPayment) {
@@ -216,9 +235,14 @@ buildTotalsRow(pivot: PivotRow[], displayedColumns: string[]) {
     this.editing = null;
   }
 
-  async togglePaid(payment: any) {
+  async togglePaid(row: PivotRow) {
+    // Build the payment object your backend expects
+    const payment = row['paymentRecord']!;
+    console.log('Toggle: ', payment);
     await this.service.togglePaid(payment);
+    row.isPaid = !row.isPaid;
     this.applyFilters();
+    this.buildThisMonthTotals();
   }  
 
   async delete(id: number) {
@@ -258,23 +282,22 @@ buildTotalsRow(pivot: PivotRow[], displayedColumns: string[]) {
     });    
   }
 
-applyFilters() {
-  let filtered = [...this.pivotPayments];
+  applyFilters() {
+    let filtered = this.pivotPayments;
+    if (this.hideZeroPayments) {
+      filtered = filtered.filter(row => {
+        const amount = row[this.currentMonth];
+        return amount !== 0 && amount !== null && amount !== undefined;
+      });  
+    }
 
-  if (this.hideZeroPayments) {
-    filtered = filtered.filter(row =>
-      Object.keys(row).some(k => k !== 'account' && row[k] !== 0)
-    );
+    if (this.showOnlyUnpaid) {
+      filtered = filtered.filter(row => {
+        return !row.isPaid;
+      });  
+    }
+    this.dataSource = new MatTableDataSource<PivotRow>(filtered);
   }
-
-  if (this.showOnlyUnpaid) {
-    filtered = filtered.filter(row =>
-      Object.keys(row).some(k => k !== 'account' && row[k] === 0)
-    );
-  }
-
-  this.dataSource.data = filtered;
-}
 
 
   groupByMonth(payments: MonthlyPayment[]) {
