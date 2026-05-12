@@ -1,14 +1,85 @@
+.page-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+  
+  @media (max-width: 600px) {
+    padding: 0; // Edge-to-edge on mobile
+  }
+}
+
+.mobile-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin-bottom: 16px;
+  
+  h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  .spacer { flex: 1; }
+}
+
+.transaction-card {
+  border-radius: 12px;
+  
+  @media (max-width: 600px) {
+    border-radius: 0;
+    height: 100vh;
+  }
+}
+
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: 1fr 1fr; // Two columns on desktop/tablets
+  gap: 8px 16px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr; // Single column on mobile
+  }
+
+  .full-row {
+    grid-column: 1 / -1;
+  }
 }
 
-.full-width {
-  grid-column: span 2;
+.subscription-box {
+  margin: 24px 0;
+  padding: 16px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  transition: background 0.3s ease;
+
+  &.active {
+    background: #e3f2fd; // Light blue highlight when active
+  }
+
+  .subscription-details {
+    margin-top: 16px;
+    display: flex;
+    animation: fadeIn 0.3s ease;
+  }
 }
 
-.action-row {
-  grid-column: span 3;
-  margin-top: 12px;
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+
+  .action-btn {
+    flex: 1;
+    height: 48px; // Larger touch target
+    font-size: 1rem;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+mat-form-field {
+  width: 100%;
 }

@@ -19,6 +19,7 @@ import { Categories } from '../../../core/models/category.model';
 import { MatDialog } from '@angular/material/dialog';
 import { EditTransactionDialogComponent } from '../edit-transaction/edit-transaction-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
   selector: 'all-transactions',
@@ -30,6 +31,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatButtonModule, 
     DatePipe, 
     CurrencyPipe, 
+    MatMenuModule,
     MatPaginatorModule,
     MatSortModule,
     MatFormFieldModule,

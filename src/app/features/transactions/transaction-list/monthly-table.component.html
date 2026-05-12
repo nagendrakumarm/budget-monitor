@@ -1,109 +1,94 @@
 <div class="page-container">
-  <h2>Monthly History</h2>
+  <div class="header-row">
+    <h2 class="page-title">Monthly History</h2>
+    <div class="legend">
+      <span class="legend-item"><span class="dot positive"></span> Surplus</span>
+      <span class="legend-item"><span class="dot negative"></span> Deficit</span>
+    </div>
+  </div>
 
-  <div class="table-wrapper">
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th>Month</th>
-          <th>Income</th>
-          <th>Total</th>
-          <th>Needs</th>
-          <th>Wants</th>
-          <th>Investments</th>
-        </tr>
-      </thead>
+  <div class="table-card mat-elevation-z2">
+    <div class="responsive-table-wrapper">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th class="sticky-col">Month</th>
+            <th>Income</th>
+            <th>Total Exp.</th>
+            <th>Needs</th>
+            <th>Wants</th>
+            <th>Invest.</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        <tr
-          *ngFor="let row of summaries"
-          [class.positive-bg]="row.income > row.total"
-          [class.negative-bg]="row.income < row.total"
-        >
-          <td>{{ row.month }}</td>
+        <tbody>
+          <tr
+            *ngFor="let row of summaries"
+            [class.status-positive]="row.income > row.total"
+            [class.status-negative]="row.income < row.total"
+          >
+            <!-- Sticky Month Column -->
+            <td class="sticky-col month-name">
+              <strong>{{ row.month }}</strong>
+            </td>
 
-          <td>{{ row.income | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td class="amount-cell income-text">
+              {{ row.income | currency:'USD':'symbol':'1.0-0' }}
+            </td>
 
-          <td>{{ row.total | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td class="amount-cell">
+              {{ row.total | currency:'USD':'symbol':'1.0-0' }}
+            </td>
 
-          <td>
-            {{ row.needs | currency:'USD':'symbol':'1.2-2' }}
-            @if (row.income > 0) {
-              <span
-                [ngClass]="(row.needs / row.income) * 100 < 40 ? 'pct-high' : 'pct-low'"
-              >
-                - {{ (row.needs / row.income) * 100 | number:'1.0-2' }}%
-              </span>
-            }
-          </td>
+            <!-- Needs Column with Badge -->
+            <td class="amount-cell">
+              <div class="cell-data">
+                <span>{{ row.needs | currency:'USD':'symbol':'1.0-0' }}</span>
+                @if (row.income > 0) {
+                  <span class="pct-badge" [ngClass]="(row.needs / row.income) * 100 <= 50 ? 'safe' : 'warning'">
+                    {{ (row.needs / row.income) * 100 | number:'1.0-0' }}%
+                  </span>
+                }
+              </div>
+            </td>
 
-          <td>
-            {{ row.wants | currency:'USD':'symbol':'1.2-2' }}
-            @if (row.income > 0) {
-              <span
-                [ngClass]="(row.wants / row.income) * 100 < 30 ? 'pct-high' : 'pct-low'"
-              >
-                - {{ (row.wants / row.income) * 100 | number:'1.0-2' }}%
-              </span>
-            }
-          </td>
+            <!-- Wants Column with Badge -->
+            <td class="amount-cell">
+              <div class="cell-data">
+                <span>{{ row.wants | currency:'USD':'symbol':'1.0-0' }}</span>
+                @if (row.income > 0) {
+                  <span class="pct-badge" [ngClass]="(row.wants / row.income) * 100 <= 30 ? 'safe' : 'warning'">
+                    {{ (row.wants / row.income) * 100 | number:'1.0-0' }}%
+                  </span>
+                }
+              </div>
+            </td>
 
-          <td>
-            {{ row.investments | currency:'USD':'symbol':'1.2-2' }}
-            @if (row.income > 0) {
-              <span
-                [ngClass]="(row.investments / row.income) * 100 < 20 ? 'pct-high' : 'pct-low'"
-              >
-                - {{ (row.investments / row.income) * 100 | number:'1.0-2' }}%
-              </span>
-            }
-          </td>
-        </tr>
-        <tr class="grand-total-row">
-          <td><strong>{{ grandTotals.month }}</strong></td>
+            <!-- Investments Column with Badge -->
+            <td class="amount-cell">
+              <div class="cell-data">
+                <span>{{ row.investments | currency:'USD':'symbol':'1.0-0' }}</span>
+                @if (row.income > 0) {
+                  <span class="pct-badge" [ngClass]="(row.investments / row.income) * 100 >= 20 ? 'safe' : 'info'">
+                    {{ (row.investments / row.income) * 100 | number:'1.0-0' }}%
+                  </span>
+                }
+              </div>
+            </td>
+          </tr>
+        </tbody>
 
-          <td>
-            <strong>{{ grandTotals.income | currency:'USD':'symbol':'1.2-2' }}</strong>
-          </td>
-
-          <td>
-            <strong>{{ grandTotals.total | currency:'USD':'symbol':'1.2-2' }}</strong>
-          </td>
-
-          <td>
-            <strong>{{ grandTotals.needs | currency:'USD':'symbol':'1.2-2' }}</strong>
-            @if (grandTotals.income > 0) {
-              <span
-                [ngClass]="(grandTotals.needs / grandTotals.income) * 100 < 40 ? 'pct-high' : 'pct-low'"
-              >
-                - {{ (grandTotals.needs / grandTotals.income) * 100 | number:'1.0-2' }}%
-              </span>
-            }
-          </td>
-
-          <td>
-            <strong>{{ grandTotals.wants | currency:'USD':'symbol':'1.2-2' }}</strong>
-            @if (grandTotals.income > 0) {
-              <span 
-                [ngClass]="(grandTotals.wants / grandTotals.income) * 100 < 30 ? 'pct-high' : 'pct-low'"
-              >
-                - {{ (grandTotals.wants / grandTotals.income) * 100 | number:'1.0-2' }}%
-              </span>
-            }
-          </td>
-
-          <td>
-            <strong>{{ grandTotals.investments | currency:'USD':'symbol':'1.2-2' }}</strong>
-            @if (grandTotals.income > 0) {
-              <span 
-                [ngClass]="(grandTotals.investments / grandTotals.income) * 100 < 20 ? 'pct-high' : 'pct-low'"
-              >
-                - {{ (grandTotals.investments / grandTotals.income) * 100 | number:'1.0-2' }}%
-              </span>
-            }
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        <tfoot>
+          <tr class="grand-total-row">
+            <td class="sticky-col">TOTAL</td>
+            <td class="amount-cell">{{ grandTotals.income | currency:'USD':'symbol':'1.0-0' }}</td>
+            <td class="amount-cell">{{ grandTotals.total | currency:'USD':'symbol':'1.0-0' }}</td>
+            <td class="amount-cell">{{ grandTotals.needs | currency:'USD':'symbol':'1.0-0' }}</td>
+            <td class="amount-cell">{{ grandTotals.wants | currency:'USD':'symbol':'1.0-0' }}</td>
+            <td class="amount-cell">{{ grandTotals.investments | currency:'USD':'symbol':'1.0-0' }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   </div>
 </div>

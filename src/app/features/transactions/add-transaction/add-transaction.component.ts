@@ -14,7 +14,8 @@ import { CurrencyPipe, DatePipe, NgIf } from '@angular/common';
 import { Categories } from '../../../core/models/category.model';
 import { CategoryService } from '../../../core/services/category.service';
 import { NgFor } from '@angular/common';
-
+import { MatIconModule } from '@angular/material/icon';
+import { Location } from '@angular/common';
 @Component({
   selector: 'app-add-transaction',
   standalone: true,
@@ -26,6 +27,7 @@ import { NgFor } from '@angular/common';
     MatSelectModule,
     MatButtonModule,
     MatDatepickerModule,
+    MatIconModule,
     MatNativeDateModule,
     MatCheckboxModule,
     NgFor,
@@ -44,6 +46,7 @@ export class AddTransactionComponent implements OnInit {
     private fb: FormBuilder,
     private txService: TransactionService,
     private categoryService: CategoryService,
+    private location: Location,
     private router: Router
   ) {}
 
@@ -112,4 +115,7 @@ export class AddTransactionComponent implements OnInit {
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }  
+  goBack(): void {
+    this.location.back();
+  }
 }

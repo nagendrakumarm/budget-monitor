@@ -1,83 +1,59 @@
-<section class="summary-card">
-  <h2>{{ selectedYear }} Category Summary</h2>
-
-  <div class="table-wrapper">
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th *ngFor="let m of months">{{ m }}</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let row of categoryTotals"
-          [class.type-row]="row.isType"
-          [class.cat-row]="row.isCat"
-        >
-          <td>{{ row.name }}</td>
-          <td *ngFor="let m of months">
-            {{ row.months[m] || 0 | number:'1.0-0' }}
-          </td>
-          <td>{{ row.total | number:'1.0-0' }}</td>
-        </tr>
-        <tr class="total-row">
-          <td><strong>Total</strong></td>
-
-          <td *ngFor="let m of months">
-            <strong>{{ monthlyTotals[m] | number:'1.0-0' }}</strong>
-          </td>
-
-          <td>
-            <strong>{{ getMonthlyGrandTotal() | number:'1.0-0' }}</strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-<!--
 <div class="page-container">
-
-    <!-- Filter Bar --
-    <section class="filter-bar">
-        <button class="nav-btn" (click)="prevMonth()">‹</button>
-
-        <div class="month-display">
-            {{ selectedYear }} - {{ selectedMonth | number:'2.0' }}
-        </div>
-
-        <button class="nav-btn" (click)="nextMonth()">›</button>
-
-        <select class="year-select" [(ngModel)]="selectedYear" (change)="loadTotalsByMonth()">
-            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
-        </select>
-        <select class="month-select" [(ngModel)]="selectedMonth" (change)="loadTotalsByMonth()">
-            <option *ngFor="let m of months" [value]="m">{{ m }}</option>
-        </select>
-    </section>    
-  <mat-card class="summary-card">
-    <h2>Amount Spent by Category</h2>
-
-    <div class="table-wrapper">
-      <table mat-table [dataSource]="categoryTotals">
-
-        <ng-container matColumnDef="category">
-          <th mat-header-cell *matHeaderCellDef> Category </th>
-          <td mat-cell *matCellDef="let row"> {{ row.category }} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="total">
-          <th mat-header-cell *matHeaderCellDef> Total Spent </th>
-          <td mat-cell *matCellDef="let row"> {{ row.total | currency }} </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="['category','total']"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['category','total']"></tr>
-
-      </table>
+  <section class="filter-bar mat-elevation-z1">
+    <div class="nav-controls">
+      <button mat-icon-button (click)="prevMonth()" type="button"><mat-icon>chevron_left</mat-icon></button>
+      <div class="date-display">{{ selectedYear }} / {{ selectedMonth + 1 | number:'2.0' }}</div>
+      <button mat-icon-button (click)="nextMonth()" type="button"><mat-icon>chevron_right</mat-icon></button>
     </div>
-  </mat-card>
+  </section>
 
-</div>-->
+  <mat-card class="summary-card">
+    <mat-card-header>
+      <mat-card-title>Category Spending Heatmap</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- The scroll wrapper ensures it doesn't break on mobile -->
+      <div class="table-scroll-wrapper">
+        <table mat-table [dataSource]="categoryTotals" class="heatmap-table">
+          
+          <!-- Category Column (Sticky) -->
+          <ng-container matColumnDef="category" sticky>
+            <th mat-header-cell *matHeaderCellDef> Category </th>
+            <td mat-cell *matCellDef="let row" [class.type-header]="row.isType"> 
+              {{ row.name }} 
+            </td>
+            <td mat-footer-cell *matFooterCellDef class="footer-cell"> Grand Total </td>
+          </ng-container>
+
+          <!-- Dynamic Month Columns -->
+          <!-- We loop through 'months', which contains strings like '2026-Jan' -->
+          <ng-container *ngFor="let m of months" [matColumnDef]="m">
+            <th mat-header-cell *matHeaderCellDef> {{ m }} </th>
+            <td mat-cell *matCellDef="let row" [class.type-header]="row.isType">
+              {{ (row.months && row.months[m] ? row.months[m] : 0) | number:'1.0-0' }}
+            </td>
+            <td mat-footer-cell *matFooterCellDef class="footer-cell">
+              {{ (monthlyTotals[m] || 0) | number:'1.0-0' }}
+            </td>
+          </ng-container>
+
+          <!-- Total Column -->
+          <ng-container matColumnDef="total">
+            <th mat-header-cell *matHeaderCellDef> Total </th>
+            <td mat-cell *matCellDef="let row" class="total-cell" [class.type-header]="row.isType"> 
+              {{ row.total | number:'1.0-0' }} 
+            </td>
+            <td mat-footer-cell *matFooterCellDef class="footer-cell grand-total">
+              {{ getMonthlyGrandTotal() | number:'1.0-0' }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

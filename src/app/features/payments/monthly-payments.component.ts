@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MonthlyPaymentsService } from '../../core/services/monthly.service';
@@ -17,7 +17,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { filter } from 'rxjs';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCard } from '@angular/material/card';
 
 interface PivotRow {
   account: string;
@@ -34,6 +35,7 @@ interface PivotRow {
     FormsModule,
     ReactiveFormsModule,
     MatCardModule,
+    MatExpansionModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -64,6 +66,7 @@ export class MonthlyPaymentsComponent implements OnInit {
   dataSource!: MatTableDataSource<PivotRow>;
 
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('paymentForm', { read: ElementRef }) cardElement!: ElementRef;
 
   totalPayments = 0;
   totalPaid = 0;
@@ -317,4 +320,10 @@ export class MonthlyPaymentsComponent implements OnInit {
     return typeof value === 'number' ? value : null;
   }
 
+  scrollToPayment() {
+    this.cardElement.nativeElement.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  }
 }

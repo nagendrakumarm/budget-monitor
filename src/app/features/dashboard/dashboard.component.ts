@@ -3,13 +3,19 @@ import { Transaction } from '../../core/models/transaction.model';
 import { TransactionService } from '../../core/services/transaction.service';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule, CurrencyPipe, PercentPipe } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterLink, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatCardModule, CurrencyPipe, PercentPipe, CommonModule, RouterModule], 
+  imports: [
+    MatCardModule, 
+    CurrencyPipe, 
+    PercentPipe, 
+    CommonModule, 
+    RouterLink,
+    RouterModule], 
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })

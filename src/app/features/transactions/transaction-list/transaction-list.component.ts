@@ -19,7 +19,8 @@ import { Categories } from '../../../core/models/category.model';
 import { EditTransactionDialogComponent } from '../edit-transaction/edit-transaction-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-
+import { MatChipsModule } from '@angular/material/chips';
+import { MatMenuModule } from '@angular/material/menu';
 @Component({
   selector: 'app-transaction-list',
   standalone: true,
@@ -31,6 +32,8 @@ import { MatIconModule } from '@angular/material/icon';
     DatePipe, 
     CurrencyPipe, 
     MatPaginatorModule,
+    MatChipsModule,
+    MatMenuModule,
     MatSortModule,
     MatFormFieldModule,
     MatInputModule,

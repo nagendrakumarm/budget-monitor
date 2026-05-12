@@ -2,82 +2,97 @@
   <h2>Dashboard</h2>
 </header>
 
-<div class="dashboard-grid">
+<div class="dashboard-container">
 
-  <!-- Monthly Income -->
-  <mat-card
-    class="card clickable"
-    [routerLink]="['/transactions']"
-    [queryParams]="{ categoryTypes: [4] }"
-  >
-    <mat-card-title>Monthly Income</mat-card-title>
-    <mat-card-content>
-      <h2>{{ totalIncome | currency }}</h2>
-    </mat-card-content>
-  </mat-card>
+  <div class="dashboard-grid">
 
-  <!-- Net Cashflow -->
-  <mat-card 
-    class="card"
-    [class.positive-bg]="netCash >= 0"
-    [class.negative-bg]="netCash < 0"
-  >
-    <mat-card-title>Net Cashflow</mat-card-title>
-    <mat-card-content>
-      <h2>{{ netCash | currency }}</h2>
-    </mat-card-content>
-  </mat-card>
+    <!-- Monthly Income -->
+    <mat-card
+      class="dash-card clickable"
+      [routerLink]="['/transactions']"
+      [queryParams]="{ categoryTypes: [4] }"
+    >
+      <div class="card-header">
+        <span class="card-title">Monthly Income</span>
+      </div>
+      <div class="card-body">
+        <span class="card-value">{{ totalIncome | currency }}</span>
+      </div>
+    </mat-card>
 
-  <!-- Monthly Expenses -->
-  <mat-card
-    class="card clickable"
-    [routerLink]="['/transactions']"
-    [queryParams]="{ categoryTypes: [1, 2, 3, 5] }"
-  >
-    <mat-card-title>Monthly Expenses</mat-card-title>
-    <mat-card-content>
-      <h2>{{ totalExpenses | currency }}</h2>
-      <h4>{{ expensePct | percent }}</h4>
-    </mat-card-content>
-  </mat-card>
+    <!-- Net Cashflow -->
+    <mat-card 
+      class="dash-card"
+      [class.positive-bg]="netCash >= 0"
+      [class.negative-bg]="netCash < 0"
+    >
+      <div class="card-header">
+        <span class="card-title">Net Cashflow</span>
+      </div>
+      <div class="card-body">
+        <span class="card-value">{{ netCash | currency }}</span>
+      </div>
+    </mat-card>
 
-  <!-- Needs -->
-  <mat-card
-    class="card clickable"
-    [routerLink]="['/transactions']"
-    [queryParams]="{ categoryTypes: [1] }"
-  >
-    <mat-card-title>Needs</mat-card-title>
-    <mat-card-content>
-      <h2>{{ totalNeeds | currency }}</h2>
-      <h4>{{ needsPct | percent }}</h4>
-    </mat-card-content>
-  </mat-card>
+    <!-- Monthly Expenses -->
+    <mat-card
+      class="dash-card clickable"
+      [routerLink]="['/transactions']"
+      [queryParams]="{ categoryTypes: [1, 2, 3, 5] }"
+    >
+      <div class="card-header">
+        <span class="card-title">Monthly Expenses</span>
+      </div>
+      <div class="card-body">
+        <span class="card-value">{{ totalExpenses | currency }}</span>
+        <span class="card-sub">{{ expensePct | percent }}</span>
+      </div>
+    </mat-card>
 
-  <!-- Wants -->
-  <mat-card
-    class="card clickable"
-    [routerLink]="['/transactions']"
-    [queryParams]="{ categoryTypes: [2] }"
-  >
-    <mat-card-title>Wants</mat-card-title>
-    <mat-card-content>
-      <h2>{{ totalWants | currency }}</h2>
-      <h4>{{ wantsPct | percent }}</h4>
-    </mat-card-content>
-  </mat-card>
+    <!-- Needs -->
+    <mat-card
+      class="dash-card clickable"
+      [routerLink]="['/transactions']"
+      [queryParams]="{ categoryTypes: [1] }"
+    >
+      <div class="card-header">
+        <span class="card-title">Needs</span>
+      </div>
+      <div class="card-body">
+        <span class="card-value">{{ totalNeeds | currency }}</span>
+        <span class="card-sub">{{ needsPct | percent }}</span>
+      </div>
+    </mat-card>
 
-  <!-- Investments -->
-  <mat-card
-    class="card clickable"
-    [routerLink]="['/transactions']"
-    [queryParams]="{ categoryTypes: [3] }"
-  >
-    <mat-card-title>Investments</mat-card-title>
-    <mat-card-content>
-      <h2>{{ totalInvestments | currency }}</h2>
-      <h4>{{ investmentsPct | percent }}</h4>
-    </mat-card-content>
-  </mat-card>
+    <!-- Wants -->
+    <mat-card
+      class="dash-card clickable"
+      [routerLink]="['/transactions']"
+      [queryParams]="{ categoryTypes: [2] }"
+    >
+      <div class="card-header">
+        <span class="card-title">Wants</span>
+      </div>
+      <div class="card-body">
+        <span class="card-value">{{ totalWants | currency }}</span>
+        <span class="card-sub">{{ wantsPct | percent }}</span>
+      </div>
+    </mat-card>
 
+    <!-- Investments -->
+    <mat-card
+      class="dash-card clickable"
+      [routerLink]="['/transactions']"
+      [queryParams]="{ categoryTypes: [3] }"
+    >
+      <div class="card-header">
+        <span class="card-title">Investments</span>
+      </div>
+      <div class="card-body">
+        <span class="card-value">{{ totalInvestments | currency }}</span>
+        <span class="card-sub">{{ investmentsPct | percent }}</span>
+      </div>
+    </mat-card>
+
+  </div>
 </div>

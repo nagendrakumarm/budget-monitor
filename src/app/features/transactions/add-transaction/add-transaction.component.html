@@ -1,34 +1,38 @@
-<div class="page-container mobile-transactions">
-  <h2 class="page-title">Add Transaction</h2>
+<div class="page-container">
+  <header class="mobile-header">
+    <button mat-icon-button (click)="goBack()" type="button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Add Transaction</h1>
+    <div class="spacer"></div>
+  </header>
 
-  <mat-card class="transaction-card">
-    <mat-card-header>
-      <mat-card-title>New Transaction</mat-card-title>
-      <mat-card-subtitle>Enter the details below</mat-card-subtitle>
-    </mat-card-header>
-
+  <mat-card class="transaction-card mat-elevation-z0">
     <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="submit()">
-
-        <div class="filters mobile-filters">
-          <mat-form-field appearance="outline" class="full-width">
+      <form [formGroup]="form" (ngSubmit)="submit()" class="transaction-form">
+        
+        <!-- Main Details Group -->
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
             <mat-label>Date</mat-label>
             <input matInput [matDatepicker]="picker" formControlName="date">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline">
+            <mat-label>Amount</mat-label>
+            <span matPrefix>$&nbsp;</span>
+            <input matInput type="number" formControlName="amount" placeholder="0.00" inputmode="decimal">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
             <mat-label>Store</mat-label>
-            <input matInput formControlName="store">
+            <input matInput formControlName="store" placeholder="e.g. Starbucks">
+            <mat-icon matSuffix>storefront</mat-icon>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
-            <input matInput formControlName="description">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline">
             <mat-label>Category</mat-label>
             <mat-select formControlName="category">
               <mat-option *ngFor="let c of categories" [value]="c">
@@ -37,26 +41,36 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Amount</mat-label>
-            <input matInput type="number" formControlName="amount">
+          <mat-form-field appearance="outline" class="full-row">
+            <mat-label>Description (Optional)</mat-label>
+            <textarea matInput formControlName="description" rows="2"></textarea>
           </mat-form-field>
         </div>
 
-        <div class="subscription-section">
-          <mat-checkbox formControlName="isSubscription">
-            Is Subscription?
-          </mat-checkbox>
+        <!-- Subscription Toggle -->
+        <div class="subscription-box" [class.active]="form.get('isSubscription')?.value">
+          <mat-slide-toggle formControlName="isSubscription" color="primary">
+            Recurring Subscription?
+          </mat-slide-toggle>
 
-          <mat-form-field appearance="outline" class="full-width" *ngIf="form.get('isSubscription')?.value">
-            <mat-label>Number of Months</mat-label>
-            <input matInput type="number" formControlName="months">
-          </mat-form-field>
+          <div class="subscription-details" *ngIf="form.get('isSubscription')?.value">
+            <mat-form-field appearance="outline">
+              <mat-label>Duration (Months)</mat-label>
+              <input matInput type="number" formControlName="months" placeholder="12">
+              <mat-icon matSuffix>calendar_month</mat-icon>
+            </mat-form-field>
+          </div>
         </div>
 
-        <button mat-raised-button color="primary" class="submit-btn" type="submit" [disabled]="form.invalid">
-          Save Transaction
-        </button>
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="goBack()" class="action-btn">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid" class="action-btn">
+            Save Transaction
+          </button>
+        </div>
 
       </form>
     </mat-card-content>

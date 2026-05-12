@@ -4,16 +4,23 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatOptionModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-category-summary',
   imports: [
     CommonModule,
     MatCardModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatOptionModule,
     FormsModule,
     MatTableModule
   ],
   templateUrl: './category-summary.component.html',
+  styleUrls: ['./category-summary.component.scss']
 })
 export class CategorySummaryComponent implements OnInit {
   categoryTotals: any[] = [];
@@ -22,7 +29,9 @@ export class CategorySummaryComponent implements OnInit {
   selectedYear = new Date().getFullYear();
 
   years: number[] = [];
-  months: string[] = [];
+  // In your component.ts
+  months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  displayedColumns: string[] = [];
   monthlyTotals: Record<string, number> = {};
   monthNames: string[] = [
     'Jan',
@@ -194,6 +203,8 @@ export class CategorySummaryComponent implements OnInit {
       this.monthlyTotals[m] = 0;
     });
 
+    this.displayedColumns = ['category', ...this.months, 'total'];
+    
     this.categoryTotals = [];
 
     Object.entries(summary).forEach(([type, cat]) => {

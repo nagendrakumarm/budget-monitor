@@ -1,65 +1,65 @@
-.transactions-card {
-  padding: 16px;
+/* Core Layout */
+.page-header {
+  margin-bottom: 16px;
+  .title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .total-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-weight: bold;
+  }
 }
 
-.header {
+/* Responsive Grid for Filters */
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 16px 16px 0 16px;
+}
+
+.date-group {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 8px;
 }
 
-.table-container {
-  overflow: auto;
-  max-height: 70vh;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-}
+/* Responsive Switching */
+.mobile-view { display: none; }
+.desktop-view { display: block; }
 
-.styled-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
+@media (max-width: 768px) {
+  .desktop-view { display: none; }
+  .mobile-view { display: block; }
 
-/* Header Styling */
-.styled-table th {
-  background: #f5f5f5;
-  font-weight: 600;
-  padding: 12px;
-  border-bottom: 2px solid #ddd;
-}
+  .transaction-item {
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+    
+    .item-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-/* Cell Styling */
-.styled-table td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-}
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      .item-store { font-weight: 600; font-size: 1rem; }
+      .item-cat { font-size: 0.8rem; color: #777; }
+      .item-date { font-size: 0.75rem; color: #999; margin-top: 2px; }
+    }
 
-/* Alternating Row Colors */
-.styled-table tr:nth-child(even) td {
-  background: #fafafa;
-}
-
-/* Hover Effect */
-.styled-table tr:hover td {
-  background: #e8f4ff;
-  cursor: pointer;
-}
-
-/* Amount Column */
-.amount-cell {
-  font-weight: 600;
-  color: #2e7d32;
-}
-
-/* Sticky Header (optional) */
-.styled-table th {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-.amount-total {
-  font-weight: bold;
-  padding-right: 16px;
+    .item-amount {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      .chevron { color: #ccc; }
+    }
+  }
 }
