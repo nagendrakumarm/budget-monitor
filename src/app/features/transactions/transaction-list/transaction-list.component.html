@@ -106,7 +106,7 @@
       </div>
       <div class="card-center">
         <div class="store-name">{{ row.store }}</div>
-        <div class="category-name">{{ row.Categories?.subtype }}</div>
+        <div class="category-name">{{ row.Categories!.subtype }}</div>
       </div>
       <div class="card-right">
         <div class="amount" [class.negative]="row.amount < 0">{{ row.amount | currency }}</div>

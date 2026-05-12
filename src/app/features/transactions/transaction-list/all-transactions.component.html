@@ -106,7 +106,7 @@
           <div class="item-main">
             <div class="item-info">
               <span class="item-store">{{ row.store }}</span>
-              <span class="item-cat">{{ row.Categories?.subtype }}</span>
+              <span class="item-cat">{{ row.Categories!.subtype }}</span>
               <span class="item-date">{{ row.date | date:'shortDate' }}</span>
             </div>
             <div class="item-amount">

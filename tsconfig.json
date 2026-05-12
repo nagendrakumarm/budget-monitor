@@ -3,6 +3,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "rootDir": "./src",
     "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,
@@ -23,5 +24,13 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "exclude": [
+    "src/test.ts",
+    "src/**/*.spec.ts",
+    "src/main.server.ts",
+    "src/server.ts",
+    "src/app/app.config.server.ts",
+    "src/app/app.routes.server.ts"
+  ]
 }
