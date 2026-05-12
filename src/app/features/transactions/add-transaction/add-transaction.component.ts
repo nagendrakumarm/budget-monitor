@@ -16,6 +16,7 @@ import { CategoryService } from '../../../core/services/category.service';
 import { NgFor } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Location } from '@angular/common';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 @Component({
   selector: 'app-add-transaction',
   standalone: true,
@@ -29,6 +30,7 @@ import { Location } from '@angular/common';
     MatDatepickerModule,
     MatIconModule,
     MatNativeDateModule,
+    MatSlideToggleModule,
     MatCheckboxModule,
     NgFor,
     NgIf

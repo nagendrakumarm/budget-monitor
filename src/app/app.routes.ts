@@ -14,21 +14,33 @@ import { CategorySummaryComponent } from './features/transactions/category-summa
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+
+  // --- PROTECTED ROUTES ---
+  // Everything inside 'children' now requires a login session
   {
-    path: 'dashboard',
-    loadComponent: () =>
-      import('../app/features/dashboard/dashboard.component').then(m => m.DashboardComponent),
-    canActivate: [authGuard]
+    path: '',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('../app/features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      { path: 'transactions', component: TransactionListComponent },
+      { path: 'transactions/new', component: AddTransactionComponent },
+      { path: 'upload', component: TransactionUploadComponent },
+      { path: 'payments', component: MonthlyPaymentsComponent },
+      { path: 'monthly', component: MonthlyTableComponent },
+      { path: 'alltransactions', component: AllTransactionsComponent },
+      { path: 'giftcards', component: GiftCardListComponent },
+      { path: 'addgiftcard', component: AddGiftCardComponent },
+      { path: 'categorySummary', component: CategorySummaryComponent },
+    ]
   },
-  { path: 'transactions', component: TransactionListComponent },
-  { path: 'transactions/new', component: AddTransactionComponent },
-  { path: 'upload', component: TransactionUploadComponent },
-  { path: 'payments', component: MonthlyPaymentsComponent },
-  { path: 'monthly', component: MonthlyTableComponent },
-  { path: 'alltransactions', component: AllTransactionsComponent },
-  { path: 'giftcards', component: GiftCardListComponent },
-  { path: 'addgiftcard', component: AddGiftCardComponent },
-  { path: 'categorySummary', component: CategorySummaryComponent },
+
+  // --- WILDCARD ---
+  // If the route doesn't exist, send them to dashboard 
+  // (the guard will then catch them if they aren't logged in)
   { path: '**', redirectTo: 'dashboard' }
 ];
