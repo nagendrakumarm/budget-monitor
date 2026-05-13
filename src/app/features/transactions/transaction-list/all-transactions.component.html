@@ -102,7 +102,7 @@
 
       <!-- MOBILE LIST (Visible on screens < 768px) -->
       <div class="mobile-view">
-        <div *ngFor="let row of dataSource.data" class="transaction-item" (click)="editTransaction(row)">
+        <div *ngFor="let row of dataSource.filteredData" class="transaction-item" (click)="editTransaction(row)">
           <div class="item-main">
             <div class="item-info">
               <span class="item-store">{{ row.store }}</span>

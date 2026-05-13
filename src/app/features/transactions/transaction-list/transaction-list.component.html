@@ -100,7 +100,7 @@
 
   <!-- Mobile List View -->
   <div class="mobile-only list-container">
-    <div *ngFor="let row of dataSource.data" class="transaction-mobile-card" (click)="editTransaction(row)">
+    <div *ngFor="let row of dataSource.filteredData" class="transaction-mobile-card" (click)="editTransaction(row)">
       <div class="card-left">
         <div class="date-pill">{{ row.date | date:'MMM d' }}</div>
       </div>

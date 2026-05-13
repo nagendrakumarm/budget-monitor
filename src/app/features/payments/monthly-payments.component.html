@@ -31,7 +31,7 @@
         <ng-container matColumnDef="account" sticky>
           <th mat-header-cell *matHeaderCellDef> Account </th>
           <td mat-cell *matCellDef="let row" class="sticky-cell"> 
-            <strong>{{ row.account }}</strong> 
+            <strong>{{ row.account }}</strong> ({{getCellValue(row, 'dueDate')}})
           </td>
           <td mat-footer-cell *matFooterCellDef class="sticky-cell footer-label"> TOTAL </td>
         </ng-container>
@@ -82,7 +82,7 @@
     <mat-card class="add-card mat-elevation-z3">
       <mat-card-header>
         <mat-card-title>Record a Payment</mat-card-title>
-        <mat-card-subtitle>Enter payment details for {{ currentMonth }}</mat-card-subtitle>
+        <mat-card-subtitle>Enter payment details for {{ formMonth }}</mat-card-subtitle>
       </mat-card-header>
       
       <mat-card-content>
@@ -115,7 +115,7 @@
             </button>
             <div class="stepper-label">
               <span class="label-text">Billing Period</span>
-              <span class="current-month-text">{{ currentMonth }}</span>
+              <span class="current-month-text"> {{ formMonth }}</span>
             </div>
             <button mat-icon-button type="button" (click)="goToNextMonth()" matTooltip="Next Month">
               <mat-icon>chevron_right</mat-icon>

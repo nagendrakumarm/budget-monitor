@@ -75,6 +75,7 @@ export class MonthlyPaymentsComponent implements OnInit {
   showOnlyUnpaid = false;
   filteredPayments: MonthlyPayment[] = [];  
   paymentsData: MonthlyPayment[] = [];
+  formMonth: string = '';
   
   constructor(
     private fb: FormBuilder,
@@ -85,11 +86,12 @@ export class MonthlyPaymentsComponent implements OnInit {
 
   async ngOnInit() {
     this.currentMonth = this.formatMonth(new Date());
+    this.formMonth = this.currentMonth;
 
     this.form = this.fb.group({
       accountId: [null],
       duedate: [{ value: null, disabled: true }],
-      month: [{ value: this.currentMonth, disabled: true }],
+      month: [{ value: this.formMonth, disabled: true }],
       amount: [0, Validators.required]
     });
     this.loadPayments();
@@ -112,7 +114,7 @@ export class MonthlyPaymentsComponent implements OnInit {
     const tx = {
       account_id: value.accountId,
       amount: value.amount,
-      month: value.month,
+      month: value.formMonth,
       is_paid: false
     };
     console.log(tx.month);
@@ -150,7 +152,7 @@ export class MonthlyPaymentsComponent implements OnInit {
         this.totalsRow = this.buildTotalsRow(this.pivotPayments, this.displayedColumns);
         this.applyFilters();
 
-    });
+      });
   }  
 
   buildThisMonthTotals() {
@@ -270,19 +272,21 @@ export class MonthlyPaymentsComponent implements OnInit {
   }
 
   goToPreviousMonth() {
-    const [year, month] = this.currentMonth.split('-').map(Number);
+    const [year, month] = this.formMonth.split('-').map(Number);
     const date = new Date(year, month - 2); // subtract 1 month (JS months are 0-based)
-    this.form.patchValue({
-      month: this.formatMonth(date)
-    });    
+    this.updateCurrentMonth(date);   
   }
 
   goToNextMonth() {
-    const [year, month] = this.currentMonth.split('-').map(Number);
+    const [year, month] = this.formMonth.split('-').map(Number);
     const date = new Date(year, month); // add 1 month
-    this.form.patchValue({
-      month: this.formatMonth(date)
-    });    
+    this.updateCurrentMonth(date);
+  }
+
+  // Centralized helper to keep everything in sync
+  private updateCurrentMonth(date: Date) {
+    this.formMonth = this.formatMonth(date);
+    this.form.patchValue({ month: this.formMonth });
   }
 
   applyFilters() {
