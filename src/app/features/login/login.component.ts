@@ -4,28 +4,37 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { SupabaseService } from '../../services/supabase.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    MatButtonModule,
+    MatCardModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
-    MatButtonModule
+    MatProgressSpinnerModule,
+    ReactiveFormsModule
+    
   ],
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit{
   loading = false;
   form!: FormGroup;
+  hidePassword = true;
 
   constructor(
     private fb: FormBuilder, 
-    private auth: AuthService,
+    private supabaseService: SupabaseService,
     private router: Router
   ) {}
 
@@ -36,19 +45,19 @@ export class LoginComponent implements OnInit{
     });
   }
 
-async login() {
-  if (this.form.invalid) return;
+  async login() {
+    if (this.form.invalid) return;
 
-  this.loading = true;
+    this.loading = true;
 
-  const { email, password } = this.form.value;
-  const { error } = await this.auth.login(email!, password!);
+    const { email, password } = this.form.value;
+    const { error } = await this.supabaseService.login(email!, password!);
 
-  if (error) {
-    alert(error.message);
-    return;
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    this.router.navigate(['dashboard']);
   }
-
-  this.router.navigate(['dashboard']);
-}
 }

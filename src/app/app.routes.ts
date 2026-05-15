@@ -11,6 +11,7 @@ import { AllTransactionsComponent } from './features/transactions/transaction-li
 import { GiftCardListComponent } from './features/gift-card/gift-card-list/gift-card-list.component';
 import { AddGiftCardComponent } from './features/gift-card/add-gift-card/add-gift-card.component';
 import { CategorySummaryComponent } from './features/transactions/category-summary/category-summary.component';
+import { WeightTrackerComponent } from './features/weight/weight-tracker.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -36,6 +37,7 @@ export const routes: Routes = [
       { path: 'giftcards', component: GiftCardListComponent },
       { path: 'addgiftcard', component: AddGiftCardComponent },
       { path: 'categorySummary', component: CategorySummaryComponent },
+      { path: 'weightTracker', component: WeightTrackerComponent }
     ]
   },
 

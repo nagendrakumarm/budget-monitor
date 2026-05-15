@@ -1,0 +1,102 @@
+.transaction-dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh; /* Keeps the modal within mobile viewport heights */
+  padding: 16px;
+  box-sizing: border-box;
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b; /* Modern dark slate text color */
+      }
+    }
+  }
+
+  mat-dialog-content {
+    margin: 0;
+    padding: 8px 4px;
+    overflow-y: auto; /* Forms scroll nicely inside here */
+  }
+
+  /* Form layouts and toggles */
+  .full-width {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .subscription-toggle-box {
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 12px;
+    margin: 16px 0;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    
+    &.active {
+      background: #f0fdf4; /* Subtle green background when subscription is active */
+      border-color: #bbf7d0;
+    }
+  }
+
+  /* Fixed Custom Actions Wrapper */
+  .custom-actions {
+    display: flex;
+    flex-direction: row; /* Force side-by-side */
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px; /* Space between buttons */
+    padding: 20px 0 10px 0;
+    width: 100%;
+    margin-top: auto; /* Pushes the actions down if modal grows */
+
+    // Using ::ng-deep to guarantee Angular Material overrides apply to the button styles
+    ::ng-deep .action-btn {
+      flex: row !important; /* Forces both buttons to be exactly equal width */
+      height: 48px !important; /* High touch target for mobile thumbs */
+      border-radius: 24px !important; /* Clean pill shape */
+      font-size: 16px !important;
+      font-weight: 500 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    ::ng-deep .submit-btn {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+}
+
+/* Global Angular Material Structural Overrides */
+::ng-deep {
+  /* Hide the default container if it still exists in the DOM template */
+  .mat-mdc-dialog-actions, 
+  .mat-dialog-actions {
+    display: none !important; 
+  }
+
+  /* Make sure inputs fill out the design properly without clipped hints */
+  .mat-mdc-form-field-subscript-wrapper {
+    margin-bottom: 4px;
+  }
+}
+
+/* Mobile specific tweaks */
+@media (max-width: 600px) {
+  ::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+    padding: 16px !important;
+  }
+}

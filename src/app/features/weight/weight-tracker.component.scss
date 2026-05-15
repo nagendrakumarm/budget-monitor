@@ -1,0 +1,214 @@
+.app-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding-bottom: 6rem; /* Space for FAB */
+}
+
+/* Header Section */
+.app-header {
+  margin-bottom: 2rem;
+}
+.app-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+.app-header p {
+  color: var(--text-muted);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Trend Chart Card */
+.chart-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 1.5rem;
+  border-radius: 24px;
+  box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.05), 
+              0 8px 10px -6px rgba(79, 70, 229, 0.05);
+  margin-bottom: 2rem;
+  height: 260px;
+}
+.chart-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.chart-wrapper {
+  height: 200px;
+  position: relative;
+}
+
+/* Log Entries List */
+/* weight-tracker.component.css */
+
+.entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Adds space between cards */
+  margin-top: 20px;
+}
+
+.entry-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  padding: 16px 20px;
+  border-radius: 18px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.entry-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #4f46e5; /* Indigo highlight */
+}
+
+.entry-unit {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-left: 4px;
+}
+.entry-item:active {
+  transform: scale(0.98); /* Native app click feel */
+}
+.entry-date {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Fix the list items */
+.entry-item {
+  background: white;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.entry-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* Floating Action Button (FAB) */
+.fab-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  z-index: 99;
+}
+.fab-btn:active {
+  transform: scale(0.9);
+}
+.fab-icon {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+/* Modern Bottom-Sheet Modal for Mobile */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end; /* Snaps to bottom on mobile */
+  justify-content: center;
+  z-index: 100;
+}
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  padding: 2rem 1.5rem;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.05);
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+.weight-input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.25rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.weight-input:focus {
+  border-color: var(--primary);
+}
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+}
+.btn-cancel {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 1rem;
+  cursor: pointer;
+}
+.btn-save {
+  flex: 2;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  padding: 1rem;
+  cursor: pointer;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Desktop Polish adjustment */
+@media (min-width: 481px) {
+  .modal-overlay {
+    align-items: center; /* Center it like a normal popup on desktop */
+  }
+  .modal-content {
+    border-radius: 24px;
+  }
+}

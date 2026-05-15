@@ -4,7 +4,7 @@ import { TransactionService } from '../../core/services/transaction.service';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule, CurrencyPipe, PercentPipe } from '@angular/common';
 import { RouterLink, RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { SupabaseService } from '../../services/supabase.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -33,7 +33,7 @@ export class DashboardComponent implements OnInit {
   netCash = 0;
 
   
-  constructor(private txService: TransactionService, private auth: AuthService) {}
+  constructor(private txService: TransactionService, private supabaseService: SupabaseService) {}
 
   ngOnInit(): void {
     this.txService.getThisMonthTransactions().then(list => {
@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit {
   }
 
   logout() {
-    this.auth.logout();
+    this.supabaseService.logout();
     window.location.href = '/login';
   }
   private calculate(): void {

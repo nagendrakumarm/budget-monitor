@@ -1,0 +1,52 @@
+<div class="app-container">
+  <header class="app-header">
+    <h1>Your Progress</h1>
+    <p class="app-subtitle">Last 30 days</p>
+  </header>
+
+  <!-- Trend Card -->
+  <section class="chart-card">
+    <div class="chart-title">Weight Trend</div>
+    <div class="chart-wrapper">
+      <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" [type]="'line'"></canvas>
+    </div>
+  </section>
+
+  <!-- Recent Entries -->
+  <section class="entries-list">
+    <div *ngFor="let log of logs" class="entry-item">
+      <div class="entry-info">
+        <div class="entry-date">{{ log.logged_at | date:'EEEE, MMM d' : 'UTC' }}</div>
+      </div>
+      <div class="entry-value">
+        {{ log.weight| number:'1.1-1' }}<span class="entry-unit">lbs</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mobile Floating Action Button -->
+  <button (click)="openEntryModal()" class="fab-btn" aria-label="Log weight">
+    <svg class="fab-icon" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+    </svg>
+  </button>
+</div>
+
+<!-- Slide up Input Modal -->
+<div *ngIf="isModalOpen" class="modal-overlay" (click)="isModalOpen = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2 class="modal-title">Log Weight</h2>
+    
+    <input #weightInput 
+           type="number" 
+           step="0.1" 
+           inputmode="decimal"
+           class="weight-input" 
+           placeholder="00.0">
+           
+    <div class="modal-actions">
+      <button (click)="isModalOpen = false" class="btn-cancel">Cancel</button>
+      <button (click)="saveWeight(weightInput.value)" class="btn-save">Save Entry</button>
+    </div>
+  </div>
+</div>

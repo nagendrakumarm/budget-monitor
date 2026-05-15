@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContainer, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogContainer, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { Transaction } from '../../../core/models/transaction.model';
@@ -12,11 +12,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { NgFor, NgIf } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-edit-transaction-dialog',
   standalone: true,
   templateUrl: './edit-transaction-dialog.component.html',
+  styleUrls: ['./edit-transaction-dialog.component.scss'],
   imports: [
     ReactiveFormsModule,
     MatDialogContent,
@@ -27,6 +31,9 @@ import { NgFor, NgIf } from '@angular/common';
     MatOptionModule,
     MatSelectModule,
     MatCheckboxModule,
+    MatIconModule,
+    MatButtonModule,
+    MatSlideToggle,
     NgFor,
     NgIf
   ]

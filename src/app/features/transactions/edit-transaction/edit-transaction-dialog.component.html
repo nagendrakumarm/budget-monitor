@@ -1,54 +1,81 @@
-<div class="page-container mobile-transactions">
-    <h2 class="page-title" mat-dialog-title>Edit Transaction</h2>
+<div class="transaction-dialog-container">
+  <div class="dialog-header" mat-dialog-title>
+    <div class="title-group">
+      <mat-icon color="primary">edit_note</mat-icon>
+      <h2>Edit Transaction</h2>
+    </div>
+    <button mat-icon-button mat-dialog-close (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-    <mat-dialog-content>
-        <form [formGroup]="form" class="dialog-form">
+  <mat-dialog-content class="modern-scroll">
+    <form [formGroup]="form" class="dialog-form">
+      
+      <div class="form-section">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Amount</mat-label>
+          <input matInput type="number" formControlName="amount" placeholder="0.00">
+          <span matPrefix>$&nbsp;</span>
+          <mat-hint>Enter the total transaction value</mat-hint>
+        </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Date</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="date">
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="date">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
 
-            <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Store</mat-label>
-            <input matInput formControlName="store">
-            </mat-form-field>
+      <div class="form-section">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Store / Vendor</mat-label>
+          <mat-icon matPrefix>storefront</mat-icon>
+          <input matInput formControlName="store" placeholder="e.g. Starbucks">
+        </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
-            <input matInput formControlName="description">
-            </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Category</mat-label>
+          <mat-icon matPrefix>category</mat-icon>
+          <mat-select formControlName="category">
+            <mat-option *ngFor="let c of categories" [value]="c.id">
+              {{ c.subtype }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
 
-            <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Category</mat-label>
-            <mat-select formControlName="category">
-                <mat-option *ngFor="let c of categories" [value]="c.id">
-                {{ c.subtype }}
-                </mat-option>
-            </mat-select>
-            </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="2"></textarea>
+      </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Amount</mat-label>
-            <input matInput type="number" formControlName="amount">
-            </mat-form-field>
+      <div class="subscription-toggle-box" [class.active]="form.get('isSubscription')?.value">
+        <mat-slide-toggle formControlName="isSubscription" color="primary">
+          Is this a recurring subscription?
+        </mat-slide-toggle>
+        
+        <div class="reveal-content" *ngIf="form.get('isSubscription')?.value">
+          <mat-form-field appearance="outline" class="full-width margin-top-sm">
+            <mat-label>Billing Cycle (Months)</mat-label>
+            <input matInput type="number" formControlName="months">
+            <mat-icon matSuffix>repeat</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
 
-            <mat-checkbox formControlName="isSubscription">
-            Is Subscription?
-            </mat-checkbox>
+    </form>
+  </mat-dialog-content>
 
-            <mat-form-field appearance="outline" class="full-width" *ngIf="form.get('isSubscription')?.value">
-                <mat-label>Number of Months</mat-label>
-                <input matInput type="number" formControlName="months">
-            </mat-form-field>
-
-            <button mat-raised-button color="primary" class="submit-btn" type="submit" (click)="save()" [disabled]="form.invalid">
-                Save Transaction
-            </button>
-            
-        </form>
-    </mat-dialog-content>
-
+  <div class="dialog-actions-container">
+    <button mat-raised-button type="button" class="action-btn" (click)="close()">Cancel</button>
+    <button mat-raised-button 
+            color="primary" 
+            class="action-btn submit-btn" 
+            (click)="save()" 
+            [disabled]="form.invalid">
+        Save Changes
+    </button>
+  </div>
 </div>
