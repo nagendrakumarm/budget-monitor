@@ -71,7 +71,7 @@ export class MonthlyPaymentsComponent implements OnInit {
   totalPayments = 0;
   totalPaid = 0;
   totalUnpaid = 0;
-  hideZeroPayments = false;
+  hideZeroPayments = true;
   showOnlyUnpaid = false;
   filteredPayments: MonthlyPayment[] = [];  
   paymentsData: MonthlyPayment[] = [];
