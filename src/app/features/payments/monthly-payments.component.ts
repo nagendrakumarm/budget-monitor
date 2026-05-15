@@ -71,7 +71,7 @@ export class MonthlyPaymentsComponent implements OnInit {
   totalPayments = 0;
   totalPaid = 0;
   totalUnpaid = 0;
-  hideZeroPayments = true;
+  hideZeroPayments = false;
   showOnlyUnpaid = false;
   filteredPayments: MonthlyPayment[] = [];  
   paymentsData: MonthlyPayment[] = [];
@@ -92,7 +92,7 @@ export class MonthlyPaymentsComponent implements OnInit {
       accountId: [null],
       duedate: [{ value: null, disabled: true }],
       month: [{ value: this.formMonth, disabled: true }],
-      amount: [0, Validators.required]
+      amount: [null, Validators.required]
     });
     this.loadPayments();
     this.accounts = await this.service.getAccounts();
@@ -114,7 +114,7 @@ export class MonthlyPaymentsComponent implements OnInit {
     const tx = {
       account_id: value.accountId,
       amount: value.amount,
-      month: value.formMonth,
+      month: this.formMonth,
       is_paid: false
     };
     console.log(tx.month);
