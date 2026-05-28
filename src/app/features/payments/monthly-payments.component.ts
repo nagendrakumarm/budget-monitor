@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MonthlyPaymentsService } from '../../core/services/monthly.service';
@@ -81,6 +81,7 @@ export class MonthlyPaymentsComponent implements OnInit {
     private fb: FormBuilder,
     private service: MonthlyPaymentsService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
     private snackBar: MatSnackBar
   ) {}
 
@@ -94,8 +95,19 @@ export class MonthlyPaymentsComponent implements OnInit {
       month: [{ value: this.formMonth, disabled: true }],
       amount: [null, Validators.required]
     });
-    this.loadPayments();
-    this.accounts = await this.service.getAccounts();
+
+    try {
+      // Now Promise.all will actually wait for loadPayments to complete
+      await Promise.all([
+        this.service.getAccounts().then(acc => this.accounts = acc),
+        this.loadPayments() 
+      ]);
+      
+      // Once this line is reached, data is guaranteed to be loaded
+      this.cdr.detectChanges();    
+    } catch (error) {
+      console.error('Error loading payments data:', error);
+    }
   }
 
   async ngAfterViewInit() {
@@ -140,18 +152,18 @@ export class MonthlyPaymentsComponent implements OnInit {
     });
   }
 
-  loadPayments() {
-    this.service.getPayments(this.currentMonth)
+  async loadPayments() {
+    return this.service.getPayments(this.currentMonth)
       .then(data => {
         const all = [...data.current, ...data.previous];
 
-        //this.buildThisMonthTotals(data.current);
         this.pivotPayments = this.buildPivot(all);
         this.dataSource = new MatTableDataSource<PivotRow>(this.pivotPayments);
         this.buildThisMonthTotals();
         this.totalsRow = this.buildTotalsRow(this.pivotPayments, this.displayedColumns);
         this.applyFilters();
 
+        this.cdr.markForCheck();
       });
   }  
 

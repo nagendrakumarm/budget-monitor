@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GiftCardService } from '../../../core/services/gift-card.service';
 import { GiftCard, GiftCardBalance } from '../../../core/models/gift-card.model';
@@ -30,6 +30,7 @@ export class GiftCardListComponent implements OnInit {
   constructor(
     private router: Router,
     private dialog: MatDialog,
+    private cdr: ChangeDetectorRef,
     private giftCardService: GiftCardService
   ) {}
 
@@ -37,6 +38,7 @@ export class GiftCardListComponent implements OnInit {
     this.loading = true;
     this.error = null;
     await this.loadGiftCards();
+    this.cdr.detectChanges();  
   }
 
   async loadGiftCards() {

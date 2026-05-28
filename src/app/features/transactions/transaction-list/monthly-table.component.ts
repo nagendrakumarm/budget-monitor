@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { MonthlySummary } from '../../../core/models/transaction.model';
@@ -13,11 +13,15 @@ export class MonthlyTableComponent implements OnInit {
   summaries: MonthlySummary[] = [];
   grandTotals: any;
 
-  constructor(private trasactionService: TransactionService) {}
+  constructor(
+    private trasactionService: TransactionService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   async ngOnInit() {
     this.summaries = await this.trasactionService.getMonthlySummary();
     this.calculateGrandTotals();
+    this.cdr.detectChanges();  
   }
 
   calculateGrandTotals() {

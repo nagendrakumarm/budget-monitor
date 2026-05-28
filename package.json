@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --configuration production --base-href /budget-monitor/",
+    "deploy": "npx angular-cli-ghpages --dir=dist/budget-monitor/browser",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:budget-monitor": "node dist/budget-monitor/server/server.mjs"

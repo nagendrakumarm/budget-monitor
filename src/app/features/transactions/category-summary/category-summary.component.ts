@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,9 +24,10 @@ import { MatOptionModule } from '@angular/material/core';
 })
 export class CategorySummaryComponent implements OnInit {
   categoryTotals: any[] = [];
-
+  isLoading = true;
   selectedMonth = new Date().getMonth();   
   selectedYear = new Date().getFullYear();
+  dataSource = new MatTableDataSource<any>([]);
 
   years: number[] = [];
   // In your component.ts
@@ -62,12 +63,14 @@ export class CategorySummaryComponent implements OnInit {
     Nov: 10,
     Dec: 11
   };
-  constructor(private txService: TransactionService) {}
+  constructor(
+    private txService: TransactionService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    //this.generateYearList();
-    //this.generateMonthList();
     this.loadSummary();
+    this.cdr.detectChanges();  
   }
 
   generateYearList() {
@@ -125,127 +128,142 @@ export class CategorySummaryComponent implements OnInit {
   }
 
   async loadSummary() {
-    const tx = await this.txService.getTransactions();
-
-    console.log(JSON.stringify(tx[0], null, 2));
-
-    // Normalize category name
-    const normalized = tx.map(t => {
-      const cat = Array.isArray(t.Categories)
-        ? t.Categories[0]
-        : t.Categories;
-
-      const ct = Array.isArray(cat.CategoryType)
-        ? cat.CategoryType[0]
-        : cat.CategoryType;
-
-      console.log(ct + ":::" + cat?.subtype + ":::" + ct?.type);
-      return {
-        amount: t.amount,
-        date: new Date(t.date),
-        type: ct?.type ?? null,       // <-- NOW WORKS
-        category: cat?.subtype ?? null
-      };
-    });
-    // Structure:
-    // { Food: [Jan, Feb, Mar, ...], Utilities: [...], ... }
-    const summary: Record<string, Record<string, Record<string, number>>> = {};
-    const monthsWithData = new Set<string>();
-
-    normalized.forEach(t => {
-      if (t.category === 'Paycheck') {
-        return;
-      }
-     
-      const iso = t.date.toISOString().slice(0, 10);
-      const [yearStr, monthStr] = iso.split('-');
-      const month = Number(monthStr) - 1; // 0–11
-      const year = Number(yearStr);
-      const label = `${year}-${this.monthNames[month]}`;
-     
-      monthsWithData.add(label);
-      const cat = t.category ?? 'Uncategorized';
-      const type = t.type ?? 'Uncategorized';
-
-      if (!summary[type]) {
-        summary[type] = {};
-      }
-
-      if (!summary[type][cat]) {
-        summary[type][cat] = {};
-      }
-
-      summary[type][cat][label] = (summary[type][cat][label] || 0) + t.amount;
-      //monthlyTotals[label] = (monthlyTotal[label] || 0 ) + t.amount;
-    });
-
-    /*const normalized2 = normalize(tx);*/
-
-    //const monthlyTotals = this.calculateMonthlyTotals(summary);
-
-    // Convert Set → sorted array
-    this.months = Array.from(monthsWithData).sort((a, b) => {
-      const [yearA, monA] = a.split('-');
-      const [yearB, monB] = b.split('-');
-
-      const yA = Number(yearA);
-      const yB = Number(yearB);
-
-      if (yA !== yB) return yA - yB;
-
-      return this.monthIndex[monA] - this.monthIndex[monB];
-    });
-
-    // Build monthly totals
-    this.monthlyTotals = {};
-
-    this.months.forEach(m => {
-      this.monthlyTotals[m] = 0;
-    });
-
-    this.displayedColumns = ['category', ...this.months, 'total'];
+    this.isLoading = true;
     
-    this.categoryTotals = [];
+    try {
+      const tx = await this.txService.getTransactions();
 
-    Object.entries(summary).forEach(([type, cat]) => {
-      // Compute total for the whole type
-      const typeTotal = Object.values(cat)
-        .flatMap(m => Object.values(m))
-        .reduce((a, b) => a + b, 0);
+      console.log(JSON.stringify(tx[0], null, 2));
 
-      this.categoryTotals.push({
-        isType: true,
-        name: `Category ${type}`,
-        months: this.buildMonthMapForType(cat),
-        total: typeTotal
+      // Normalize category name
+      const normalized = tx.map(t => {
+        const cat = Array.isArray(t.Categories)
+          ? t.Categories[0]
+          : t.Categories;
+
+        const ct = Array.isArray(cat.CategoryType)
+          ? cat.CategoryType[0]
+          : cat.CategoryType;
+
+        console.log(ct + ":::" + cat?.subtype + ":::" + ct?.type);
+        return {
+          amount: t.amount,
+          date: new Date(t.date),
+          type: ct?.type ?? null,       // <-- NOW WORKS
+          category: cat?.subtype ?? null
+        };
+      });
+      // Structure:
+      // { Food: [Jan, Feb, Mar, ...], Utilities: [...], ... }
+      const summary: Record<string, Record<string, Record<string, number>>> = {};
+      const monthsWithData = new Set<string>();
+
+      normalized.forEach(t => {
+        if (t.category === 'Paycheck') {
+          return;
+        }
+      
+        const iso = t.date.toISOString().slice(0, 10);
+        const [yearStr, monthStr] = iso.split('-');
+        const month = Number(monthStr) - 1; // 0–11
+        const year = Number(yearStr);
+        const label = `${year}-${this.monthNames[month]}`;
+      
+        monthsWithData.add(label);
+        const cat = t.category ?? 'Uncategorized';
+        const type = t.type ?? 'Uncategorized';
+
+        if (!summary[type]) {
+          summary[type] = {};
+        }
+
+        if (!summary[type][cat]) {
+          summary[type][cat] = {};
+        }
+
+        summary[type][cat][label] = (summary[type][cat][label] || 0) + t.amount;
+        //monthlyTotals[label] = (monthlyTotal[label] || 0 ) + t.amount;
       });
 
-      console.log(this.categoryTotals);
-      // Add each subtype row
-      Object.entries(cat).forEach(([subtype, months]) => {
-        const subtypeTotal = Object.values(months).reduce((a, b) => a + b, 0);
+      /*const normalized2 = normalize(tx);*/
+
+      //const monthlyTotals = this.calculateMonthlyTotals(summary);
+
+      // Convert Set → sorted array
+      this.months = Array.from(monthsWithData).sort((a, b) => {
+        const [yearA, monA] = a.split('-');
+        const [yearB, monB] = b.split('-');
+
+        const yA = Number(yearA);
+        const yB = Number(yearB);
+
+        if (yA !== yB) return yA - yB;
+
+        return this.monthIndex[monA] - this.monthIndex[monB];
+      });
+
+      // Build monthly totals
+      this.monthlyTotals = {};
+
+      this.months.forEach(m => {
+        this.monthlyTotals[m] = 0;
+      });
+
+      this.displayedColumns = ['category', ...this.months, 'total'];
+      
+      this.categoryTotals = [];
+
+      Object.entries(summary).forEach(([type, cat]) => {
+        // Compute total for the whole type
+        const typeTotal = Object.values(cat)
+          .flatMap(m => Object.values(m))
+          .reduce((a, b) => a + b, 0);
 
         this.categoryTotals.push({
-          isType: false,
-          name: subtype,
-          months,
-          total: subtypeTotal
+          isType: true,
+          name: `Category ${type}`,
+          months: this.buildMonthMapForType(cat),
+          total: typeTotal
+        });
+
+        console.log(this.categoryTotals);
+        // Add each subtype row
+        Object.entries(cat).forEach(([subtype, months]) => {
+          const subtypeTotal = Object.values(months).reduce((a, b) => a + b, 0);
+
+          this.categoryTotals.push({
+            isType: false,
+            name: subtype,
+            months,
+            total: subtypeTotal
+          });
+        });
+      });    
+  
+      Object.values(this.categoryTotals).forEach(monthMap => {
+        this.months.forEach(m => {
+          if(monthMap.isType) {
+            for (const month of Object.keys(monthMap.months)) { 
+              if (m == month) {
+                this.monthlyTotals[m] = (this.monthlyTotals[m] || 0) + monthMap.months[m];
+              } 
+            }
+          }
         });
       });
-    });    
- 
-    Object.values(this.categoryTotals).forEach(monthMap => {
-      this.months.forEach(m => {
-        if(monthMap.isType) {
-          for (const month of Object.keys(monthMap.months)) { 
-            if (m == month) {
-              this.monthlyTotals[m] = (this.monthlyTotals[m] || 0) + monthMap.months[m];
-            } 
-          }
-        }
-      });
-    });
-}
+      
+      this.categoryTotals = [...this.categoryTotals]; // Create a new reference
+      this.dataSource.data = this.categoryTotals;      // Update the table source
+      
+      console.log("Data loaded into table:", this.dataSource.data);
+      this.isLoading = false; // Turn off loading
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error("Error loading category summary data", error);
+      this.isLoading = false;    
+    }
+    
+  }
 
   getMonthlyGrandTotal(): number {
     return this.months.reduce(

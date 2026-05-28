@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Transaction } from '../../core/models/transaction.model';
 import { TransactionService } from '../../core/services/transaction.service';
 import { MatCardModule } from '@angular/material/card';
@@ -33,12 +33,16 @@ export class DashboardComponent implements OnInit {
   netCash = 0;
 
   
-  constructor(private txService: TransactionService, private supabaseService: SupabaseService) {}
+  constructor(
+    private txService: TransactionService, 
+    private cdr: ChangeDetectorRef,
+    private supabaseService: SupabaseService) {}
 
   ngOnInit(): void {
     this.txService.getThisMonthTransactions().then(list => {
         this.transactions = list;
         this.calculate();
+        this.cdr.markForCheck();
     });
   }
 
