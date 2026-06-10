@@ -47,6 +47,11 @@
           </mat-form-field>
         </div>
 
+        <div class="subscription-box">
+          <mat-slide-toggle formControlName="isInRuppes" color="primary">
+            Spent in Ruppes?
+          </mat-slide-toggle>
+        </div>
         <!-- Subscription Toggle -->
         <div class="subscription-box" [class.active]="form.get('isSubscription')?.value">
           <mat-slide-toggle formControlName="isSubscription" color="primary">

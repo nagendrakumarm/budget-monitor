@@ -19,7 +19,6 @@ export class TransactionService {
       .toISOString()
       .split('T')[0];
 
-    console.log('Main: ', categoryTypes);
     return this.getTransactions(categoryTypes, startOfMonth, endOfMonth);
   }
 
@@ -67,7 +66,6 @@ export class TransactionService {
       query = query.in('Categories.id', subTypes);
     }
 
-    console.log("In:" , query);
     const {data, error} = await query;
 
     if (error) throw error;

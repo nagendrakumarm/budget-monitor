@@ -60,13 +60,13 @@ export class AddTransactionComponent implements OnInit {
       category: ['', Validators.required],
       amount: ['', Validators.required],
       isSubscription: [false],
+      isInRuppes: [false],
       months: []
     });
 
     // Load categories from Supabase
     this.categories = await this.categoryService.getCategories();
-    console.log('Categories:' , this.categories.length);
-
+    
     this.form.get('isSubscription')?.valueChanges.subscribe(isSub => {
       const monthsControl = this.form.get('months');
 
@@ -86,7 +86,11 @@ export class AddTransactionComponent implements OnInit {
 
     const value = this.form.value;
 
-    console.log('Form Sub:', value.isSubscription)
+    console.log('Form Rupees:', value.isInRuppes);
+    if (value.isInRuppes) {
+      value.amount = Number((value.amount / 95.31).toFixed(2)); // Convert to dollars
+      console.log('Converted Amount:', value.amount);
+    }
 
     const tx = {
       date: this.formatDateOnly(value.date),
@@ -99,7 +103,6 @@ export class AddTransactionComponent implements OnInit {
     };
     console.log(':date:', tx.date, ':store:', tx.store, ':description:', tx.description, ':cat:' , tx.category, ':Amt:', tx.amount)
 
-    console.log('TX Sub:', tx.isSubscription)
     try {
       await this.txService.addTransaction(tx).then(() => {
         this.router.navigate(['/transactions']);

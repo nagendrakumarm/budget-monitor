@@ -81,15 +81,13 @@ export class SupabaseService {
     const user = (await this.supabase.auth.getUser()).data.user;
     return user ? user.id : null;*/
     const localSession = await this.supabase.auth.getSession();
-  console.log('1. Raw Local Session Data:', localSession.data.session);
-
-  const serverUser = await this.supabase.auth.getUser();
-  console.log('2. Raw Server User Data:', serverUser.data.user);
-
-  if (localSession.data.session?.user) {
-    return localSession.data.session.user.id;
-  }
-  return serverUser.data.user ? serverUser.data.user.id : null;
+  
+    const serverUser = await this.supabase.auth.getUser();
+  
+    if (localSession.data.session?.user) {
+      return localSession.data.session.user.id;
+    }
+    return serverUser.data.user ? serverUser.data.user.id : null;
   }
 
   async getWeightLogs() {

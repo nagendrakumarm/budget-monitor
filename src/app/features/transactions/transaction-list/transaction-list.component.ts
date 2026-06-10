@@ -83,13 +83,10 @@ export class TransactionListComponent implements AfterViewInit  {
 
     // Load categories from Supabase
     this.categoryTypes = await this.categoryService.getCategories();
-    console.log('Categories:' , this.categoryTypes);
   }
 
   load(categoryTypes?: number[]): void {
-    console.log('Before: ', categoryTypes);
     const types = categoryTypes && categoryTypes.length != 0? categoryTypes : [1, 2, 3, 5];
-    console.log('After: ', types);
     this.txService.getThisMonthTransactions(types).then(list => {
         this.transactions = list;
         this.dataSource.data = this.transactions;
