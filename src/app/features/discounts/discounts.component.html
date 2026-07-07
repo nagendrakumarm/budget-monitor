@@ -1,0 +1,103 @@
+<div class="page-container">
+  <div class="header-section">
+    <h2>Discounts & Cashbacks</h2>
+    <button mat-flat-button color="primary" class="desktop-only" (click)="addNew()">
+      <mat-icon>add</mat-icon> Add Discount
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filter-card">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search</mat-label>
+      <input matInput (keyup)="applyTextFilter($event)" placeholder="Merchant or Account">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </mat-card>
+
+  <!-- Summary -->
+  <div class="summary-bar">
+    <mat-chip-listbox>
+      <mat-chip-option color="accent" selected>
+        Active Discounts: {{ getActiveTotal() }}
+      </mat-chip-option>
+    </mat-chip-listbox>
+  </div>
+
+  <!-- Desktop Table -->
+  <div class="desktop-only table-container mat-elevation-z2">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <ng-container matColumnDef="account">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Account</th>
+        <td mat-cell *matCellDef="let row">{{ row.account }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="merchant">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Merchant</th>
+        <td mat-cell *matCellDef="let row"><strong>{{ row.merchant }}</strong></td>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let row" class="text-muted">{{ row.description }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="expiryDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Expiry</th>
+        <td mat-cell *matCellDef="let row" [class.soon]="isExpiringSoon(row.expiryDate)">
+          {{ row.expiryDate | date:'mediumDate' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let row">
+          <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="editDiscount(row)"><mat-icon>edit</mat-icon> Edit</button>
+            <button mat-menu-item (click)="deleteDiscount(row)" class="text-danger"><mat-icon>delete</mat-icon> Delete</button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+  <!-- Mobile Cards -->
+  <div class="mobile-only list-container">
+    <div *ngFor="let row of dataSource.filteredData" class="discount-mobile-card">
+      <div class="card-left">
+        <div class="date-pill">{{ row.expiryDate | date:'MMM d' }}</div>
+      </div>
+      <div class="card-center">
+        <div class="merchant-name">{{ row.merchant }}</div>
+        <div class="account-name">{{ row.account }}</div>
+      </div>
+      <div class="card-right">
+        <div class="status" [class.expiring]="isExpiringSoon(row.expiryDate)">
+          {{ row.isActive ? 'Active' : 'Expired' }}
+        </div>
+        <button mat-icon-button [matMenuTriggerFor]="mobileMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #mobileMenu="matMenu">
+          <button mat-menu-item (click)="editDiscount(row)">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-menu-item (click)="deleteDiscount(row)" class="text-danger">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile FAB -->
+  <button mat-fab color="primary" class="mobile-fab mobile-only" (click)="addNew()">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
