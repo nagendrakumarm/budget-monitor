@@ -29,7 +29,7 @@
     <table mat-table [dataSource]="dataSource" matSort>
       <ng-container matColumnDef="account">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Account</th>
-        <td mat-cell *matCellDef="let row">{{ row.account }}</td>
+        <td mat-cell *matCellDef="let row">{{ row.Accounts?.name }}</td>
       </ng-container>
 
       <ng-container matColumnDef="merchant">
@@ -44,8 +44,8 @@
 
       <ng-container matColumnDef="expiryDate">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Expiry</th>
-        <td mat-cell *matCellDef="let row" [class.soon]="isExpiringSoon(row.expiryDate)">
-          {{ row.expiryDate | date:'mediumDate' }}
+        <td mat-cell *matCellDef="let row" [class.soon]="isExpiringSoon(row.expiry_date)">
+          {{ row.expiry_date | date:'mediumDate' }}
         </td>
       </ng-container>
 
@@ -71,15 +71,15 @@
   <div class="mobile-only list-container">
     <div *ngFor="let row of dataSource.filteredData" class="discount-mobile-card">
       <div class="card-left">
-        <div class="date-pill">{{ row.expiryDate | date:'MMM d' }}</div>
+        <div class="date-pill">{{ row.expiry_date | date:'MMM d' }}</div>
       </div>
       <div class="card-center">
         <div class="merchant-name">{{ row.merchant }}</div>
-        <div class="account-name">{{ row.account }}</div>
+        <div class="account-name">{{ row.Accounts?.name }}</div>
       </div>
       <div class="card-right">
-        <div class="status" [class.expiring]="isExpiringSoon(row.expiryDate)">
-          {{ row.isActive ? 'Active' : 'Expired' }}
+        <div class="status" [class.expiring]="isExpiringSoon(row.expiry_date)">
+          {{ row.is_active ? 'Active' : 'Expired' }}
         </div>
         <button mat-icon-button [matMenuTriggerFor]="mobileMenu">
           <mat-icon>more_vert</mat-icon>

@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MonthlyPaymentsService } from '../../core/services/monthly.service';
 import { PaymentAccount } from '../../core/models/payment.models';
+import { DiscountsService } from '../../core/services/discounts.service';
+import { Router } from '@angular/router';
+import { Discount } from '../../core/models/discount.model';
+
 
 // Angular Material
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,15 +16,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
-
-export interface Discount {
-  id: string;
-  account: string;
-  merchant: string;
-  description: string;
-  expiryDate: Date;
-  isActive: boolean;
-}
 
 @Component({
   selector: 'app-add-discount',
@@ -46,7 +41,9 @@ export class AddDiscountComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private paymentService: MonthlyPaymentsService
+    private discountService: DiscountsService,
+    private paymentService: MonthlyPaymentsService,
+    private router: Router
   ) {
     this.form = this.fb.group({
       account: ['', Validators.required],
@@ -63,26 +60,30 @@ export class AddDiscountComponent implements OnInit {
     
   }
 
-  save() {
+  async submit() {
     console.log('Save clicked. Value:', this.form.valid, this.form.value);
     if (this.form.valid) {
       const val = this.form.value;
       const newDiscount: Discount = {
-        id: crypto.randomUUID(),
-        account: val.account,
+        account_id: this.accounts.find(a => a.name === val.account)?.id || 0,
         merchant: val.merchant,
-        description: val.description,
-        expiryDate: val.expiryDate,
-        isActive: true
+        description: val.description || '',
+        expiry_date: val.expiryDate,
+        created_at: new Date().toISOString(),
+        is_active: true
       };
 
-      const data = localStorage.getItem('discounts');
-      const list: Discount[] = data ? JSON.parse(data) : [];
-      list.push(newDiscount);
-      localStorage.setItem('discounts', JSON.stringify(list));
+      try {
+        await this.discountService.addDiscount(newDiscount).then(() => {
+          alert('Discount added successfully!');
+          this.router.navigate(['/discounts']);
+        });
+      }
+      catch (err) {
+        console.error('Insert Discount failed:', err);
+        alert('Insert failed:'+ err);
+      }
 
-      alert('Discount added successfully!');
-      this.form.patchValue({ account: '', merchant: '', description: '', expiryDate: '' });
     }
   }
 

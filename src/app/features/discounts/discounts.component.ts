@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Discount } from '../../core/models/discount.model';
+import { DiscountsService } from '../../core/services/discounts.service';
 import { Router } from '@angular/router';
+import { Discount } from '../../core/models/discount.model';
 
 // Angular Material imports
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -49,23 +50,25 @@ export class DiscountsComponent implements OnInit {
   dataSource = new MatTableDataSource<Discount>([]);
   searchText = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private discountService: DiscountsService
+  ) {}
 
   ngOnInit() {
     this.loadDiscounts();
   }
 
   loadDiscounts() {
-    const data = localStorage.getItem('discounts');
-    const list: Discount[] = data ? JSON.parse(data) : [];
-    const today = new Date();
-
-    list.forEach(d => {
-      if (new Date(d.expiryDate) < today) d.isActive = false;
+    const data = this.discountService.getDiscounts().then(discounts => {
+      const today = new Date();
+      const list: Discount[] = discounts || [];
+      list.forEach(d => {
+        //if (new Date(d.expiry_date) < today) d.is_active = false;
+      });
+      this.dataSource.data = list;
+      console.log('Loaded discounts:', this.dataSource.data);
     });
-
-    this.dataSource.data = list;
-    localStorage.setItem('discounts', JSON.stringify(list));
   }
 
   addNew() {
@@ -89,7 +92,7 @@ export class DiscountsComponent implements OnInit {
 
   getActiveTotal(): number {
     return this.dataSource.data
-      .filter(d => d.isActive)
+      .filter(d => d.is_active)
       .length;
   }
 

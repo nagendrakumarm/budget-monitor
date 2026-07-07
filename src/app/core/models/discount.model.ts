@@ -1,10 +1,16 @@
+export interface Accounts {
+  id: number;
+  name: string;
+}  
+
 export interface Discount {
-  id: string;
-  accountId: string;       // e.g., "HDFC-Credit", "Chase-Savings"
-  account: string;     // Display name
+  id?: number;              // Unique identifier
+  account_id: number;         // Foreign key to PaymentAccount
+  account?: string;     // Display name
   merchant: string;        // e.g., "Amazon", "Uber"
   description: string;     // e.g., "5% cashback on groceries"
-  expiryDate: Date;      
-  isActive: boolean;       // Auto false if expired
-  createdAt: string;
+  expiry_date: Date;      
+  is_active: boolean;       // Auto false if expired
+  created_at: string;
+  Accounts?: Accounts; // Optional relationship to PaymentAccount
 }

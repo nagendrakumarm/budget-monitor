@@ -2,7 +2,7 @@
   <mat-card>
     <h2>Add Discount / Cashback</h2>
 
-    <form [formGroup]="form" (ngSubmit)="save()">
+    <form [formGroup]="form" (ngSubmit)="submit()">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Account</mat-label>
         <mat-select formControlName="accountId" (selectionChange)="onAccountChange($event.value)">
