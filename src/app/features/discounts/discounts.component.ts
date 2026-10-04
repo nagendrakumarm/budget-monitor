@@ -63,10 +63,9 @@ export class DiscountsComponent implements OnInit {
     const data = this.discountService.getDiscounts().then(discounts => {
       const today = new Date();
       const list: Discount[] = discounts || [];
-      list.forEach(d => {
-        //if (new Date(d.expiry_date) < today) d.is_active = false;
-      });
-      this.dataSource.data = list;
+      const activeDiscounts = list.filter(d => new Date(d.expiry_date) >= today);
+      
+      this.dataSource.data = activeDiscounts;
       console.log('Loaded discounts:', this.dataSource.data);
     });
   }

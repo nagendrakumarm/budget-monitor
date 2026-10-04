@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { supabase } from '../supabase.client';
 import { Transaction, MonthlySummary } from '../models/transaction.model';
 import { start } from 'node:repl';
+import { Categories } from '../models/category.model';
 
 @Injectable({ providedIn: 'root' })
 export class TransactionService {
@@ -24,66 +25,88 @@ export class TransactionService {
 
   async getTransactions(
     categoryTypes?: number[], 
-    startDate?: String, 
-    endDate?: String,
+    startDate?: string, 
+    endDate?: string,
     subTypes?: number[]
   ): Promise<Transaction[]> {
+    const pageSize = 1000;
+    let allRawData: any[] = [];
+    let page = 0;
+    let hasMore = true;
 
-    let query = supabase
-      .from('Transactions')
-      .select(`
-        id,
-        amount,
-        date,
-        description,
-        store,
-        category,
-        Categories!inner (
-            id,
-            type,
-            subtype,
-            Categories_Type_fkey (
+    // Automatically loops and fetches all chunks if data exceeds 1,000 records
+    while (hasMore) {
+      const from = page * pageSize;
+      const to = from + pageSize - 1;
+
+      let query = supabase
+        .from('Transactions')
+        .select(`
+          id,
+          amount,
+          date,
+          description,
+          store,
+          category,
+          Categories!inner (
               id,
-              type
-            )
-        )
-      `)
-      .order('date', { ascending: false });
+              type,
+              subtype,
+              Categories_Type_fkey (
+                id,
+                type
+              )
+          )
+        `)
+        .order('date', { ascending: false })
+        .range(from, to);
 
-    if(categoryTypes && categoryTypes.length > 0) {
-      query = query.in('Categories.type', categoryTypes);
+      if (categoryTypes && categoryTypes.length > 0) {
+        query = query.in('Categories.type', categoryTypes);
+      }
+
+      if (startDate) {
+        query = query.gte('date', startDate);
+      }
+
+      if (endDate) {
+        query = query.lte('date', endDate);
+      }
+
+      if (subTypes && subTypes.length > 0) {
+        query = query.in('Categories.id', subTypes);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        hasMore = false;
+      } else {
+        allRawData.push(...data);
+        if (data.length < pageSize) {
+          hasMore = false; // Reached the end of the dataset
+        }
+      }
+      page++;
     }
 
-    if(startDate) {
-      query.gte('date', startDate);
-    }
-
-    if(endDate) {
-      query.lte('date', endDate);
-    }
-
-    if(subTypes && subTypes.length > 0) {
-      query = query.in('Categories.id', subTypes);
-    }
-
-    const {data, error} = await query;
-
-    if (error) throw error;
-
-    const normalized: Transaction[] = data.map((t: any) => {
+    // Normalize the collected dataset into Transaction[]
+    const normalized: Transaction[] = allRawData.map((t: any) => {
       const cat = t.Categories;
       const ctArray = cat.Categories_Type_fkey;
 
       const normalizedCategoryType =
-        ctArray && ctArray.length > 0
+        Array.isArray(ctArray) && ctArray.length > 0
           ? {
               id: Number(ctArray[0].id),
               type: String(ctArray[0].type)
             }
           : {
-            id: Number(ctArray.id),
-            type: String(ctArray.type)
-          };
+              id: Number(ctArray?.id),
+              type: String(ctArray?.type)
+            };
 
       return {
         id: Number(t.id),
@@ -202,7 +225,21 @@ export class TransactionService {
     return data;
   }
 
-  async getMonthlySummary(): Promise<MonthlySummary[]> {
+  private async getAvailableMonths(): Promise<string[]> {
+    const { data, error } = await supabase.rpc('get_available_months');
+
+    if (error) throw error;
+
+    return data ?? [];
+  }
+
+  private async fetchMonth(month: string) {
+    const [year, mon] = month.split('-').map(Number);
+
+    const start = `${year}-${String(mon).padStart(2, '0')}-01`;
+    const endDate = new Date(year, mon, 0);
+    const end = `${year}-${String(mon).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+
     const { data, error } = await supabase
       .from('Transactions')
       .select(`
@@ -212,55 +249,146 @@ export class TransactionService {
         description,
         store,
         category,
-        Categories (
-            id,
-            type,
-            subtype
+        Categories!left (
+          id,
+          type,
+          subtype
         )
-      `);
+      `)
+      .gte('date', start)
+      .lte('date', end)
+      .order('date', { ascending: true });
 
     if (error) throw error;
 
-    const normalized = data.map(t => ({
+    return data;
+  }
+
+  private async fetchAllMonthsData(): Promise<Transaction[]> {
+    const months = await this.getAvailableMonths();
+    console.log('Available months:', months);
+    const all: Transaction[] = [];
+
+    for (const month of months) {
+      const rows = await this.fetchMonth(month);
+
+      const normalizedRows = rows.map(r => {
+        let cat: Categories | null = null;
+
+        if (Array.isArray(r.Categories) && r.Categories.length > 0) {
+          const c = r.Categories[0] as any;   // force TS to treat it as object
+          cat = {
+            id: c.id,
+            type: c.type,
+            subtype: c.subtype,
+            CategoryType: null
+          };
+        } else if (r.Categories) {
+          const c = r.Categories as any;      // force TS to treat it as object
+          cat = {
+            id: c.id,
+            type: c.type,
+            subtype: c.subtype,
+            CategoryType: null
+          };
+        }
+
+        return {
+          ...r,
+          Categories: cat as Categories
+        };
+      });
+
+
+      all.push(...normalizedRows);
+    }
+
+    return all;
+  }
+
+
+  async getMonthlySummary(): Promise<MonthlySummary[]> {
+    const raw = await this.fetchAllMonthsData();
+
+    const normalized = raw.map(t => {
+      const dateStr =
+        typeof t.date === 'string'
+          ? t.date
+          : new Date(t.date).toISOString().slice(0, 10);
+
+      return {
         ...t,
+        date: dateStr,
         Categories: Array.isArray(t.Categories)
-            ? t.Categories[0]   // take the first element
-            : t.Categories
-    }));
+          ? t.Categories[0] ?? null
+          : t.Categories ?? null
+      };
+    });
 
     return this.groupByMonth(normalized as Transaction[]);
   }
 
   private groupByMonth(transactions: Transaction[]): MonthlySummary[] {
-    const map = new Map<string, MonthlySummary>();
+    if (!transactions.length) return [];
 
-    for (const t of transactions) {
-      const month = t.date.slice(0, 7); // "YYYY-MM"
+    // Parse dates WITHOUT timezone shift
+    const parsed = transactions.map(t => {
+      const [y, m, d] = t.date.split('-').map(Number);
+      return {
+        ...t,
+        dateObj: new Date(y, m - 1, d)  // local date, no UTC shift
+      };
+    });
 
-      if (!map.has(month)) {
-        map.set(month, {
-          month,
-          income: 0,
-          total: 0,
-          needs: 0,
-          wants: 0,
-          investments: 0
-        });
-      }
+    // Determine min/max month range
+    const minDate = new Date(Math.min(...parsed.map(t => t.dateObj.getTime())));
+    const maxDate = new Date(Math.max(...parsed.map(t => t.dateObj.getTime())));
 
-      const entry = map.get(month)!;
-      const type = t.Categories?.type;
-      //entry.total += t.amount;
+    // Generate all months between min and max
+    const monthKeys: string[] = [];
+    const cursor = new Date(minDate);
 
-      if (typeof type === 'number' && [1, 2, 3].includes(type)) entry.total += t.amount;
-      if (t.Categories?.type === 1) entry.needs += t.amount;
-      if (t.Categories?.type === 2) entry.wants += t.amount;
-      if (t.Categories?.type === 3) entry.investments += t.amount;
-      if (t.Categories?.type === 4) entry.income += t.amount;
+    while (cursor <= maxDate) {
+      const y = cursor.getFullYear();
+      const m = String(cursor.getMonth() + 1).padStart(2, '0');
+      monthKeys.push(`${y}-${m}`);
+      cursor.setMonth(cursor.getMonth() + 1);
     }
 
-    return Array.from(map.values());
-  }  
+    // Initialize summary map
+    const map = new Map<string, MonthlySummary>();
+    monthKeys.forEach(key => {
+      map.set(key, {
+        month: key,
+        income: 0,
+        total: 0,
+        needs: 0,
+        wants: 0,
+        investments: 0
+      });
+    });
+
+    // Apply transactions
+    for (const t of parsed) {
+      const y = t.dateObj.getFullYear();
+      const m = String(t.dateObj.getMonth() + 1).padStart(2, '0');
+      const key = `${y}-${m}`;
+
+      const entry = map.get(key);
+      if (!entry) continue;
+
+      const type = t.Categories?.type;
+
+      if ([1, 2, 3].includes(type)) entry.total += t.amount;
+      if (type === 1) entry.needs += t.amount;
+      if (type === 2) entry.wants += t.amount;
+      if (type === 3) entry.investments += t.amount;
+      if (type === 4) entry.income += t.amount;
+    }
+
+    // Sorted output
+    return Array.from(map.values()).sort((a, b) => a.month.localeCompare(b.month));
+  }
 
   async getCategoryTotals() {
     const { data, error } = await supabase
