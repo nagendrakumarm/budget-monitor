@@ -94,8 +94,8 @@ export class AddTransactionComponent implements OnInit {
 
     const tx = {
       date: this.formatDateOnly(value.date),
-      store: value.store!,
-      description: value.description || '',
+      store: value.store!.trim(),
+      description: value.description?.trim() || '',
       category: value.category.id!,
       amount: Number(value.amount),
       isSubscription: Boolean(value.isSubscription),
